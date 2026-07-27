@@ -62,13 +62,14 @@ async function main() {
     where: { slug: { notIn: CATEGORY_NAMES.map(slugify) } },
   });
 
-  for (const name of CATEGORY_NAMES) {
+  for (const [index, name] of CATEGORY_NAMES.entries()) {
     const slug = slugify(name);
+    const sortOrder = index * 10;
 
     await prisma.category.upsert({
       where: { slug },
-      update: { name },
-      create: { name, slug },
+      update: { name, sortOrder },
+      create: { name, slug, sortOrder },
     });
   }
 

@@ -6,7 +6,7 @@ import { slugify } from "@/lib/slug";
 
 export async function GET() {
   const categories = await prisma.category.findMany({
-    orderBy: { name: "asc" },
+    orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
     include: { _count: { select: { products: true } } },
   });
   return NextResponse.json({ categories });
@@ -32,12 +32,16 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Kategori dengan nama serupa sudah ada" }, { status: 409 });
   }
 
+  const { _min } = await prisma.category.aggregate({ _min: { sortOrder: true } });
+  const sortOrder = (_min.sortOrder ?? 0) - 10;
+
   const category = await prisma.category.create({
     data: {
       name: parsed.data.name,
       slug,
       description: parsed.data.description || null,
       imageUrl: parsed.data.imageUrl || null,
+      sortOrder,
     },
   });
 

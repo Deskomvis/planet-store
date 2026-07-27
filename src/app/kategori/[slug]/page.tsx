@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { SiteHeader } from "@/components/site-header";
@@ -57,7 +58,9 @@ export default async function CategoryPage({ params }: Props) {
 
   return (
     <>
-      <SiteHeader />
+      <Suspense fallback={null}>
+        <SiteHeader />
+      </Suspense>
       <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-6">
         <nav className="text-sm text-neutral-500">
           <Link href="/" className="hover:underline">
@@ -72,12 +75,14 @@ export default async function CategoryPage({ params }: Props) {
         {category.products.length === 0 ? (
           <p className="mt-8 text-sm text-neutral-500">Belum ada produk di kategori ini.</p>
         ) : (
-          <CategoryProductGrid
-            products={category.products}
-            categoryName={category.name}
-            whatsappNumber={whatsappNumber}
-            whatsappMessageTemplate={whatsappMessageTemplate}
-          />
+          <Suspense fallback={null}>
+            <CategoryProductGrid
+              products={category.products}
+              categoryName={category.name}
+              whatsappNumber={whatsappNumber}
+              whatsappMessageTemplate={whatsappMessageTemplate}
+            />
+          </Suspense>
         )}
       </main>
       <SiteFooter />

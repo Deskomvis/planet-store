@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { DeleteButton } from "@/components/admin/delete-button";
+import { ReorderButtons } from "@/components/admin/reorder-buttons";
 
 export default async function AdminCategoriesPage() {
   const categories = await prisma.category.findMany({
-    orderBy: { name: "asc" },
+    orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
     include: { _count: { select: { products: true } } },
   });
 
@@ -24,6 +25,7 @@ export default async function AdminCategoriesPage() {
         <table className="w-full text-left text-sm">
           <thead className="border-b border-neutral-200 bg-neutral-50">
             <tr>
+              <th className="px-4 py-2 font-medium text-neutral-600">Urutan</th>
               <th className="px-4 py-2 font-medium text-neutral-600">Nama</th>
               <th className="px-4 py-2 font-medium text-neutral-600">Slug</th>
               <th className="px-4 py-2 font-medium text-neutral-600">Produk</th>
@@ -31,8 +33,15 @@ export default async function AdminCategoriesPage() {
             </tr>
           </thead>
           <tbody>
-            {categories.map((category) => (
+            {categories.map((category, i) => (
               <tr key={category.id} className="border-b border-neutral-100 last:border-0">
+                <td className="px-4 py-2">
+                  <ReorderButtons
+                    categoryId={category.id}
+                    disableUp={i === 0}
+                    disableDown={i === categories.length - 1}
+                  />
+                </td>
                 <td className="px-4 py-2 text-neutral-900">{category.name}</td>
                 <td className="px-4 py-2 text-neutral-500">{category.slug}</td>
                 <td className="px-4 py-2 text-neutral-500">{category._count.products}</td>
@@ -54,7 +63,7 @@ export default async function AdminCategoriesPage() {
             ))}
             {categories.length === 0 ? (
               <tr>
-                <td colSpan={4} className="px-4 py-6 text-center text-neutral-500">
+                <td colSpan={5} className="px-4 py-6 text-center text-neutral-500">
                   Belum ada kategori.
                 </td>
               </tr>
