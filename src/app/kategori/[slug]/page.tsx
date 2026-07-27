@@ -62,11 +62,21 @@ export default async function CategoryPage({ params }: Props) {
         <SiteHeader />
       </Suspense>
       <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-6">
-        <nav className="text-sm text-neutral-500">
-          <Link href="/" className="hover:underline">
+        <Link
+          href="/"
+          className="inline-flex cursor-pointer items-center gap-1.5 rounded text-sm font-medium text-neutral-600 transition-colors hover:text-neutral-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+        >
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+          Kembali ke Katalog
+        </Link>
+
+        <nav aria-label="Breadcrumb" className="mt-2 text-sm text-neutral-500">
+          <Link href="/" className="hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
             Katalog
           </Link>{" "}
-          / <span className="text-neutral-900">{category.name}</span>
+          / <span aria-current="page" className="text-neutral-900">{category.name}</span>
         </nav>
 
         <h1 className="mt-2 text-xl font-bold text-neutral-900">{category.name}</h1>

@@ -41,7 +41,7 @@ export function ReorderButtons({
         onClick={() => move("up")}
         disabled={loading || disableUp}
         aria-label="Naikkan urutan"
-        className="px-1 text-neutral-500 hover:text-neutral-900 disabled:opacity-25"
+        className="cursor-pointer px-1 text-neutral-500 transition-colors hover:text-neutral-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:cursor-not-allowed disabled:opacity-25"
       >
         ▲
       </button>
@@ -50,7 +50,7 @@ export function ReorderButtons({
         onClick={() => move("down")}
         disabled={loading || disableDown}
         aria-label="Turunkan urutan"
-        className="px-1 text-neutral-500 hover:text-neutral-900 disabled:opacity-25"
+        className="cursor-pointer px-1 text-neutral-500 transition-colors hover:text-neutral-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:cursor-not-allowed disabled:opacity-25"
       >
         ▼
       </button>

@@ -62,6 +62,9 @@ export function ProductLightbox({
 
   return (
     <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={product.name}
       className="fixed inset-0 z-50 flex flex-col bg-black/90 p-4"
       onClick={onClose}
     >
@@ -80,7 +83,7 @@ export function ProductLightbox({
             type="button"
             onClick={goPrev}
             aria-label="Sebelumnya"
-            className="absolute left-0 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 sm:-left-14"
+            className="absolute left-0 z-10 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:-left-14"
           >
             ‹
           </button>
@@ -91,7 +94,7 @@ export function ProductLightbox({
             type="button"
             onClick={onClose}
             aria-label="Tutup"
-            className="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-black/5 text-neutral-700 hover:bg-black/10"
+            className="absolute right-3 top-3 z-10 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-black/5 text-neutral-700 transition-colors hover:bg-black/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
           >
             ✕
           </button>
@@ -122,7 +125,7 @@ export function ProductLightbox({
             type="button"
             onClick={goNext}
             aria-label="Berikutnya"
-            className="absolute right-0 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 sm:-right-14"
+            className="absolute right-0 z-10 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:-right-14"
           >
             ›
           </button>
@@ -139,7 +142,7 @@ export function ProductLightbox({
             href={waHref}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 rounded-full bg-green-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-green-700"
+            className="flex cursor-pointer items-center gap-2 rounded-full bg-green-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-green-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
           >
             Share ke WhatsApp Admin
           </a>

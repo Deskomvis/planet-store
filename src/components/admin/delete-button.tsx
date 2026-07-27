@@ -33,7 +33,7 @@ export function DeleteButton({
     <button
       onClick={handleDelete}
       disabled={loading}
-      className="text-sm font-medium text-red-600 hover:text-red-800 disabled:opacity-50"
+      className="cursor-pointer text-sm font-medium text-red-600 transition-colors hover:text-red-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
     >
       {loading ? "Menghapus..." : "Hapus"}
     </button>

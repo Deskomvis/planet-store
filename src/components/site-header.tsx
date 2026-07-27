@@ -41,6 +41,9 @@ function SearchBox() {
 
   return (
     <div className="relative flex-1">
+      <label htmlFor="header-search" className="sr-only">
+        {placeholder}
+      </label>
       <svg
         className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400"
         fill="none"
@@ -51,11 +54,12 @@ function SearchBox() {
         <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z" />
       </svg>
       <input
+        id="header-search"
         type="text"
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder={placeholder}
-        className="w-full rounded-full border border-neutral-200 bg-neutral-50 py-2 pl-9 pr-4 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-neutral-400 focus:outline-none"
+        className="w-full rounded-full border border-neutral-200 bg-neutral-50 py-2 pl-9 pr-4 text-sm text-neutral-900 placeholder:text-neutral-400 transition-colors focus:border-neutral-400 focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
       />
     </div>
   );
@@ -78,7 +82,9 @@ export function SiteHeader() {
           type="button"
           onClick={() => setSidebarOpen(true)}
           aria-label="Buka menu"
-          className="flex shrink-0 items-center justify-center rounded-full p-2 text-neutral-700 hover:bg-neutral-100"
+          aria-haspopup="dialog"
+          aria-expanded={sidebarOpen}
+          className="flex shrink-0 cursor-pointer items-center justify-center rounded-full p-2 text-neutral-700 transition-colors hover:bg-neutral-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
         >
           <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />

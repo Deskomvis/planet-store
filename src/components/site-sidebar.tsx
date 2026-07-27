@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -11,6 +11,9 @@ export function SiteSidebar({ open, onClose }: { open: boolean; onClose: () => v
   const pathname = usePathname();
   const [categories, setCategories] = useState<CategoryItem[]>([]);
   const [query, setQuery] = useState("");
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const asideRef = useRef<HTMLElement>(null);
+  const triggerRef = useRef<Element | null>(null);
 
   useEffect(() => {
     if (!open || categories.length > 0) return;
@@ -22,9 +25,12 @@ export function SiteSidebar({ open, onClose }: { open: boolean; onClose: () => v
 
   useEffect(() => {
     if (!open) return;
+    triggerRef.current = document.activeElement;
     document.body.style.overflow = "hidden";
+    closeButtonRef.current?.focus();
     return () => {
       document.body.style.overflow = "";
+      if (triggerRef.current instanceof HTMLElement) triggerRef.current.focus();
     };
   }, [open]);
 
@@ -33,41 +39,88 @@ export function SiteSidebar({ open, onClose }: { open: boolean; onClose: () => v
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
+  useEffect(() => {
+    if (!open) return;
+
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        onClose();
+        return;
+      }
+      if (e.key !== "Tab") return;
+
+      const focusable = asideRef.current?.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), input, [tabindex]:not([tabindex="-1"])'
+      );
+      if (!focusable || focusable.length === 0) return;
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [open, onClose]);
+
   const filtered = query.trim()
     ? categories.filter((c) => c.name.toLowerCase().includes(query.trim().toLowerCase()))
     : categories;
 
-  if (!open) return null;
-
   return (
-    <div className="fixed inset-0 z-50">
-      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+    <div
+      className={`fixed inset-0 z-50 ${open ? "" : "pointer-events-none"}`}
+      aria-hidden={!open}
+    >
+      <div
+        onClick={onClose}
+        className={`absolute inset-0 bg-black/40 transition-opacity duration-300 motion-reduce:transition-none ${
+          open ? "opacity-100" : "opacity-0"
+        }`}
+      />
 
-      <aside className="absolute left-0 top-0 h-full w-80 max-w-[85vw] overflow-y-auto bg-blue-50 shadow-xl">
+      <aside
+        ref={asideRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Menu navigasi"
+        className={`absolute left-0 top-0 flex h-full w-80 max-w-[85vw] flex-col overflow-y-auto bg-blue-50 shadow-xl transition-transform duration-300 ease-out motion-reduce:transition-none will-change-transform ${
+          open ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
         <div className="flex items-center justify-between px-4 py-4">
           <Image src="/logo.webp" alt="Planet Store" width={40} height={40} priority />
           <button
+            ref={closeButtonRef}
             type="button"
             onClick={onClose}
             aria-label="Tutup menu"
-            className="rounded-full p-1 text-neutral-700 hover:bg-black/5"
+            className="cursor-pointer rounded-full p-2 text-neutral-700 transition-colors hover:bg-black/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
           >
-            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
-        <nav className="px-4">
+        <nav aria-label="Navigasi utama" className="px-4">
           <Link
             href="/"
-            className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium ${
+            aria-current={pathname === "/" ? "page" : undefined}
+            className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 ${
               pathname === "/"
                 ? "bg-blue-200/70 text-neutral-900"
                 : "text-neutral-700 hover:bg-blue-100"
             }`}
           >
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg className="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -78,9 +131,12 @@ export function SiteSidebar({ open, onClose }: { open: boolean; onClose: () => v
           </Link>
         </nav>
 
-        <div className="mx-4 my-4 h-px bg-blue-200" />
+        <div className="mx-4 mt-4 h-px bg-blue-200" />
 
-        <div className="px-4">
+        <div className="px-4 pt-4">
+          <label htmlFor="sidebar-category-search" className="sr-only">
+            Cari kategori
+          </label>
           <div className="relative">
             <svg
               className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400"
@@ -92,37 +148,44 @@ export function SiteSidebar({ open, onClose }: { open: boolean; onClose: () => v
               <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z" />
             </svg>
             <input
+              id="sidebar-category-search"
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Cari kategori..."
-              className="w-full rounded-full border border-blue-200 bg-white py-2 pl-9 pr-4 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-neutral-400 focus:outline-none"
+              className="w-full rounded-full border border-blue-200 bg-white py-2 pl-9 pr-4 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-neutral-400 focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
             />
           </div>
         </div>
 
-        <div className="mx-4 my-4 h-px bg-blue-200" />
+        <div className="mx-4 mb-2 mt-4 h-px bg-blue-200" />
 
         <div className="px-4 pb-6">
-          <p className="text-xs font-semibold tracking-wide text-neutral-500">COLLECTION</p>
-          <ul className="mt-2 space-y-1">
-            {filtered.map((category) => (
-              <li key={category.id}>
-                <Link
-                  href={`/kategori/${category.slug}`}
-                  className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-neutral-700 hover:bg-blue-100"
-                >
-                  <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M3 7a2 2 0 012-2h4l2 2h6a2 2 0 012 2v7a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"
-                    />
-                  </svg>
-                  {category.name}
-                </Link>
-              </li>
-            ))}
+          <p className="px-3 text-xs font-semibold tracking-wide text-neutral-500">COLLECTION</p>
+          <ul className="mt-2 space-y-0.5">
+            {filtered.map((category) => {
+              const isActive = pathname === `/kategori/${category.slug}`;
+              return (
+                <li key={category.id}>
+                  <Link
+                    href={`/kategori/${category.slug}`}
+                    aria-current={isActive ? "page" : undefined}
+                    className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 ${
+                      isActive ? "bg-blue-200/70 font-medium text-neutral-900" : "text-neutral-700 hover:bg-blue-100"
+                    }`}
+                  >
+                    <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M3 7a2 2 0 012-2h4l2 2h6a2 2 0 012 2v7a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"
+                      />
+                    </svg>
+                    <span className="line-clamp-1">{category.name}</span>
+                  </Link>
+                </li>
+              );
+            })}
             {filtered.length === 0 ? (
               <li className="px-3 py-2 text-sm text-neutral-500">Kategori tidak ditemukan.</li>
             ) : null}
