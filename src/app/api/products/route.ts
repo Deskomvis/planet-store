@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/require-admin";
 import { productSchema } from "@/lib/validation";
@@ -52,6 +53,8 @@ export async function POST(request: NextRequest) {
       categoryId: parsed.data.categoryId,
     },
   });
+
+  revalidatePath(`/kategori/${category.slug}`);
 
   return NextResponse.json({ product }, { status: 201 });
 }

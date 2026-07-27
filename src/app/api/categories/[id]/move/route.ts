@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/require-admin";
 
@@ -38,6 +39,8 @@ export async function POST(request: NextRequest, { params }: Params) {
     prisma.category.update({ where: { id: current.id }, data: { sortOrder: neighbor.sortOrder } }),
     prisma.category.update({ where: { id: neighbor.id }, data: { sortOrder: current.sortOrder } }),
   ]);
+
+  revalidatePath("/");
 
   return NextResponse.json({ ok: true });
 }

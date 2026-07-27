@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/require-admin";
 import { productSchema } from "@/lib/validation";
@@ -25,6 +26,11 @@ export async function PUT(request: NextRequest, { params }: Params) {
     return NextResponse.json({ error: "Kategori tidak ditemukan" }, { status: 400 });
   }
 
+  const existing = await prisma.product.findUnique({
+    where: { id },
+    select: { category: { select: { slug: true } } },
+  });
+
   const baseSlug = slugify(parsed.data.name);
   let slug = baseSlug;
   let suffix = 1;
@@ -47,6 +53,11 @@ export async function PUT(request: NextRequest, { params }: Params) {
     },
   });
 
+  revalidatePath(`/kategori/${category.slug}`);
+  if (existing && existing.category.slug !== category.slug) {
+    revalidatePath(`/kategori/${existing.category.slug}`);
+  }
+
   return NextResponse.json({ product });
 }
 
@@ -55,7 +66,13 @@ export async function DELETE(_request: NextRequest, { params }: Params) {
   if (response) return response;
 
   const { id } = await params;
+  const existing = await prisma.product.findUnique({
+    where: { id },
+    select: { category: { select: { slug: true } } },
+  });
   await prisma.product.delete({ where: { id } });
+
+  if (existing) revalidatePath(`/kategori/${existing.category.slug}`);
 
   return NextResponse.json({ ok: true });
 }

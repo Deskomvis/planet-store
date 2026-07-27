@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/require-admin";
 import { categorySchema } from "@/lib/validation";
@@ -44,6 +45,8 @@ export async function POST(request: NextRequest) {
       sortOrder,
     },
   });
+
+  revalidatePath("/");
 
   return NextResponse.json({ category }, { status: 201 });
 }

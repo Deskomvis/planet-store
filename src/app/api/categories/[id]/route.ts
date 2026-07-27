@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/require-admin";
 import { categorySchema } from "@/lib/validation";
@@ -29,6 +30,8 @@ export async function PUT(request: NextRequest, { params }: Params) {
     return NextResponse.json({ error: "Kategori dengan nama serupa sudah ada" }, { status: 409 });
   }
 
+  const existing = await prisma.category.findUnique({ where: { id }, select: { slug: true } });
+
   const category = await prisma.category.update({
     where: { id },
     data: {
@@ -39,6 +42,10 @@ export async function PUT(request: NextRequest, { params }: Params) {
     },
   });
 
+  revalidatePath("/");
+  if (existing) revalidatePath(`/kategori/${existing.slug}`);
+  if (existing && existing.slug !== slug) revalidatePath(`/kategori/${slug}`);
+
   return NextResponse.json({ category });
 }
 
@@ -47,7 +54,11 @@ export async function DELETE(_request: NextRequest, { params }: Params) {
   if (response) return response;
 
   const { id } = await params;
+  const existing = await prisma.category.findUnique({ where: { id }, select: { slug: true } });
   await prisma.category.delete({ where: { id } });
+
+  revalidatePath("/");
+  if (existing) revalidatePath(`/kategori/${existing.slug}`);
 
   return NextResponse.json({ ok: true });
 }
