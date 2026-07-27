@@ -18,7 +18,7 @@ export function ImageInput({
   value: string;
   onChange: (url: string) => void;
 }) {
-  const [mode, setMode] = useState<"url" | "upload">("url");
+  const [mode, setMode] = useState<"url" | "upload">("upload");
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -60,15 +60,6 @@ export function ImageInput({
         <div className="flex overflow-hidden rounded border border-neutral-300 text-xs">
           <button
             type="button"
-            onClick={() => setMode("url")}
-            className={`px-2.5 py-1 font-medium ${
-              mode === "url" ? "bg-neutral-900 text-white" : "text-neutral-600 hover:bg-neutral-50"
-            }`}
-          >
-            URL
-          </button>
-          <button
-            type="button"
             onClick={() => setMode("upload")}
             className={`px-2.5 py-1 font-medium ${
               mode === "upload"
@@ -77,6 +68,15 @@ export function ImageInput({
             }`}
           >
             Upload
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode("url")}
+            className={`px-2.5 py-1 font-medium ${
+              mode === "url" ? "bg-neutral-900 text-white" : "text-neutral-600 hover:bg-neutral-50"
+            }`}
+          >
+            URL (opsional)
           </button>
         </div>
       </div>
