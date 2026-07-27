@@ -9,6 +9,7 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showResetHelp, setShowResetHelp] = useState(false);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -83,6 +84,24 @@ export default function AdminLoginPage() {
             {loading ? "Memproses..." : "Masuk"}
           </button>
         </form>
+
+        <button
+          type="button"
+          onClick={() => setShowResetHelp((v) => !v)}
+          className="mt-4 text-sm text-neutral-500 underline hover:text-neutral-700"
+        >
+          Lupa password?
+        </button>
+
+        {showResetHelp ? (
+          <div className="mt-3 rounded border border-neutral-200 bg-neutral-50 p-3 text-xs text-neutral-600">
+            <p>Reset password lewat terminal server, di folder project ini:</p>
+            <pre className="mt-2 overflow-x-auto rounded bg-neutral-900 p-2 text-neutral-100">
+              npm run db:reset-admin-password -- {email || "email@admin"} password-baru
+            </pre>
+            <p className="mt-2">Password minimal 6 karakter. Setelah itu login pakai password baru.</p>
+          </div>
+        ) : null}
       </div>
     </main>
   );
