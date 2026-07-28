@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { VideoInput } from "@/components/admin/video-input";
 import { DeleteButton } from "@/components/admin/delete-button";
 
@@ -169,8 +169,11 @@ function TestimonialForm({
 
 export function TestimonialManagement({ initialTestimonials }: { initialTestimonials: ManagedTestimonial[] }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [testimonials, setTestimonials] = useState(initialTestimonials);
-  const [mode, setMode] = useState<"list" | "add" | ManagedTestimonial>("list");
+  const [mode, setMode] = useState<"list" | "add" | ManagedTestimonial>(
+    searchParams.get("new") ? "add" : "list"
+  );
   const [filter, setFilter] = useState<Filter>("all");
 
   const filtered = filter === "all" ? testimonials : testimonials.filter((t) => t.format === filter);
