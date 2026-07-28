@@ -15,8 +15,10 @@ export default async function AdminProtectedLayout({
       <header className="border-b border-neutral-200 bg-white">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
           <div className="flex items-center gap-6">
-            <Link href="/admin" className="flex items-center gap-2 text-lg font-bold text-neutral-900">
-              <Image src="/logo.webp" alt="Planet Store" width={28} height={28} />
+            <Link href="/admin" className="flex items-center gap-2.5 text-lg font-bold text-neutral-900">
+              <span className="flex shrink-0 items-center rounded-lg bg-neutral-900 px-2 py-1">
+                <Image src="/logo-gudang.webp" alt="Planet Store" width={108} height={28} />
+              </span>
               Admin Planet Store
             </Link>
             <nav className="flex items-center gap-4">

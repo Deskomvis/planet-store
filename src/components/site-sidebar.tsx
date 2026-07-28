@@ -96,7 +96,12 @@ export function SiteSidebar({ open, onClose }: { open: boolean; onClose: () => v
         }`}
       >
         <div className="flex items-center justify-between px-4 py-4">
-          <Image src="/logo.webp" alt="Planet Store" width={40} height={40} priority />
+          <Link
+            href="/"
+            className="flex shrink-0 items-center rounded-lg bg-neutral-900 px-2.5 py-1.5 transition-colors hover:bg-neutral-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+          >
+            <Image src="/logo-gudang.webp" alt="Planet Store" width={139} height={36} priority />
+          </Link>
           <button
             ref={closeButtonRef}
             type="button"

@@ -79,8 +79,11 @@ export function SiteHeader() {
   return (
     <header className="border-b border-neutral-200 bg-white">
       <div className="mx-auto flex max-w-5xl items-center gap-4 px-4 py-3">
-        <Link href="/" className="flex shrink-0 items-center gap-2">
-          <Image src="/logo.webp" alt="Planet Store" width={36} height={36} priority />
+        <Link
+          href="/"
+          className="flex shrink-0 items-center rounded-lg bg-neutral-900 px-2.5 py-1.5 transition-colors hover:bg-neutral-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+        >
+          <Image src="/logo-gudang.webp" alt="Planet Store" width={139} height={36} priority />
         </Link>
 
         <SearchBox key={pathname} />
