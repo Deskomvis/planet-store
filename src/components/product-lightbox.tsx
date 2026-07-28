@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import Image from "next/image";
 import { StockBadge } from "@/components/stock-badge";
 import { buildWhatsappMessage } from "@/lib/whatsapp";
 import { toggleFavorite } from "@/lib/favorites";
@@ -133,7 +132,7 @@ export function ProductLightbox({
           </button>
         ) : null}
 
-        <div className="relative aspect-square w-full max-h-[70vh] overflow-hidden rounded-xl bg-white">
+        <div className="relative max-h-[70vh] w-fit max-w-full overflow-hidden rounded-xl bg-white">
           <button
             type="button"
             onClick={onClose}
@@ -144,16 +143,14 @@ export function ProductLightbox({
           </button>
 
           {product.imageUrl ? (
-            <Image
+            // eslint-disable-next-line @next/next/no-img-element -- natural aspect ratio without cropping; dimensions unknown ahead of time
+            <img
               src={product.imageUrl}
               alt={product.name}
-              fill
-              sizes="90vw"
-              className="object-cover"
-              priority
+              className="block max-h-[70vh] w-auto max-w-full object-contain"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center text-sm text-neutral-400">
+            <div className="flex aspect-square w-[70vh] max-w-full items-center justify-center text-sm text-neutral-400">
               Tidak ada gambar
             </div>
           )}
