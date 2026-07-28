@@ -10,7 +10,7 @@ export type SliderBanner = {
 };
 
 const SLIDE_WIDTH_RATIO = 0.62; // "center" slide width relative to the container
-const GAP_PX = 16;
+const GAP_PX = 10;
 const AUTO_ADVANCE_MS = 3500;
 
 export function BannerSlider({ banners }: { banners: SliderBanner[] }) {
@@ -64,7 +64,6 @@ export function BannerSlider({ banners }: { banners: SliderBanner[] }) {
       >
         {track.map((banner, i) => {
           const distance = Math.abs(i - virtualIndex);
-          const scale = distance === 0 ? 1 : distance === 1 ? 0.72 : 0.6;
           const opacity = distance === 0 ? 1 : distance === 1 ? 0.85 : 0.5;
 
           const content = (
@@ -87,9 +86,8 @@ export function BannerSlider({ banners }: { banners: SliderBanner[] }) {
               style={{
                 width: slideWidth || undefined,
                 marginRight: GAP_PX,
-                transform: `scale(${scale})`,
                 opacity,
-                transition: "transform 700ms ease, opacity 700ms ease",
+                transition: "opacity 700ms ease",
               }}
             >
               {banner.link ? (
