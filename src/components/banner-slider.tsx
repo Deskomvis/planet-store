@@ -16,7 +16,11 @@ const AUTO_ADVANCE_MS = 3500;
 export function BannerSlider({ banners }: { banners: SliderBanner[] }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(0);
+  // Grows forever (never wraps with %) so the track only ever moves one
+  // direction; once a full cycle has scrolled by, it's rewound by exactly
+  // one cycle with the transition disabled so the rewind is invisible.
   const [step, setStep] = useState(0);
+  const [instant, setInstant] = useState(false);
   const [paused, setPaused] = useState(false);
 
   const n = banners.length;
@@ -37,11 +41,17 @@ export function BannerSlider({ banners }: { banners: SliderBanner[] }) {
     return () => clearInterval(id);
   }, [n, paused]);
 
+  useEffect(() => {
+    if (!instant) return;
+    const id = requestAnimationFrame(() => setInstant(false));
+    return () => cancelAnimationFrame(id);
+  }, [instant]);
+
   if (n === 0) return null;
 
   const slideWidth = containerWidth * SLIDE_WIDTH_RATIO;
   const cellWidth = slideWidth + GAP_PX;
-  const virtualIndex = n + (((step % n) + n) % n);
+  const virtualIndex = n + step;
   const track = [...banners, ...banners, ...banners];
 
   const translateX = containerWidth
@@ -59,7 +69,14 @@ export function BannerSlider({ banners }: { banners: SliderBanner[] }) {
         className="flex"
         style={{
           transform: `translateX(${translateX}px)`,
-          transition: containerWidth ? "transform 700ms ease" : "none",
+          transition: containerWidth && !instant ? "transform 700ms ease" : "none",
+        }}
+        onTransitionEnd={(e) => {
+          if (e.propertyName !== "transform") return;
+          if (step >= n) {
+            setInstant(true);
+            setStep((s) => s - n);
+          }
         }}
       >
         {track.map((banner, i) => {
