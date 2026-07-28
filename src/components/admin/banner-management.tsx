@@ -56,7 +56,7 @@ function BannerLinkDialog({
     >
       <div className="w-full max-w-sm rounded-lg bg-white p-5 shadow-xl" onClick={(e) => e.stopPropagation()}>
         <h2 className="text-base font-bold text-neutral-900">Tautan Banner</h2>
-        <div className="relative mt-3 aspect-[16/9] w-full overflow-hidden rounded-lg bg-neutral-100">
+        <div className="relative mt-3 aspect-[16/6] w-full overflow-hidden rounded-lg bg-neutral-100">
           <Image src={banner.imageUrl} alt="Banner" fill className="object-cover" />
         </div>
         <div className="mt-4">
@@ -154,7 +154,9 @@ export function BannerManagement({ initialBanners }: { initialBanners: ManagedBa
         <div>
           <h2 className="text-lg font-bold text-neutral-900">Banner Katalog</h2>
           <p className="mt-1 text-sm text-neutral-500">
-            Tampil sebagai slider di bagian atas halaman katalog. Rasio disarankan 16:9.
+            Tampil sebagai slider di bagian atas halaman katalog. Gunakan gambar landscape
+            dengan rasio 16:6 (mis. 1600 x 600px) agar tidak terpotong, dan posisikan objek
+            penting di tengah karena tepi kiri-kanan bisa sedikit terpotong di layar mobile.
           </p>
         </div>
         <button
@@ -200,7 +202,7 @@ export function BannerManagement({ initialBanners }: { initialBanners: ManagedBa
                 onClick={() => setEditing(banner)}
                 className="block w-full cursor-pointer text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
               >
-                <div className="relative aspect-[16/9] w-full overflow-hidden bg-neutral-100">
+                <div className="relative aspect-[16/6] w-full overflow-hidden bg-neutral-100">
                   <Image
                     src={banner.imageUrl}
                     alt="Banner"
