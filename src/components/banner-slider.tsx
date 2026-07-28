@@ -32,12 +32,28 @@ export function BannerSlider({ banners }: { banners: SliderBanner[] }) {
       setContainerWidth(entries[0].contentRect.width);
     });
     observer.observe(el);
-    return () => observer.disconnect();
+
+    // Safety net: if the tab was frozen/discarded while hidden, the observer
+    // can miss the first measurement on return. Re-measure directly off the
+    // element once the tab is visible again instead of waiting on it.
+    const remeasure = () => {
+      if (document.visibilityState === "visible") {
+        setContainerWidth(el.getBoundingClientRect().width);
+      }
+    };
+    document.addEventListener("visibilitychange", remeasure);
+
+    return () => {
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", remeasure);
+    };
   }, []);
 
   useEffect(() => {
     if (n <= 1 || paused) return;
-    const id = setInterval(() => setStep((s) => s + 1), AUTO_ADVANCE_MS);
+    const id = setInterval(() => {
+      if (document.visibilityState === "visible") setStep((s) => s + 1);
+    }, AUTO_ADVANCE_MS);
     return () => clearInterval(id);
   }, [n, paused]);
 
@@ -61,7 +77,11 @@ export function BannerSlider({ banners }: { banners: SliderBanner[] }) {
   return (
     <div
       ref={containerRef}
-      className="relative overflow-hidden"
+      // Matches the center slide's own aspect ratio (16/7, 16/6) scaled down
+      // by SLIDE_WIDTH_RATIO, so this reserves the exact same height purely
+      // in CSS — the area never collapses to 0 while JS is still waiting for
+      // a width measurement (e.g. right after a background tab is restored).
+      className="relative aspect-[16/4.34] overflow-hidden sm:aspect-[16/3.72]"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
@@ -92,6 +112,7 @@ export function BannerSlider({ banners }: { banners: SliderBanner[] }) {
                 sizes="70vw"
                 className="object-cover"
                 priority={distance === 0}
+                loading={distance === 0 ? undefined : distance === 1 ? "eager" : "lazy"}
               />
             </div>
           );
