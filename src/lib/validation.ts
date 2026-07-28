@@ -21,6 +21,11 @@ export const testimonialSchema = z.object({
   videoUrl: z.string().url("Video wajib diunggah"),
 });
 
+export const bannerSchema = z.object({
+  imageUrl: z.string().url("Gambar wajib diunggah"),
+  link: z.union([z.string().url("URL tautan tidak valid"), z.literal(""), z.null()]).optional(),
+});
+
 export const loginSchema = z.object({
   email: z.string().trim().email("Email tidak valid"),
   password: z.string().min(6, "Password minimal 6 karakter"),

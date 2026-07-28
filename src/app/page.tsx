@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { CategoryGrid } from "@/components/category-grid";
+import { BannerSlider } from "@/components/banner-slider";
 import { extractMapEmbedSrc } from "@/lib/google-maps";
 
 export const revalidate = 300; // ISR: re-generate at most every 5 minutes
@@ -20,19 +21,34 @@ async function getCategories() {
   });
 }
 
+async function getBanners() {
+  return prisma.banner.findMany({
+    orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
+  });
+}
+
 async function getMapEmbedSrc() {
   const settings = await prisma.storeSettings.findUnique({ where: { id: "settings" } });
   return extractMapEmbedSrc(settings?.googleMapsEmbed);
 }
 
 export default async function HomePage() {
-  const [categories, mapEmbedSrc] = await Promise.all([getCategories(), getMapEmbedSrc()]);
+  const [categories, banners, mapEmbedSrc] = await Promise.all([
+    getCategories(),
+    getBanners(),
+    getMapEmbedSrc(),
+  ]);
 
   return (
     <>
       <Suspense fallback={null}>
         <SiteHeader />
       </Suspense>
+      {banners.length > 0 ? (
+        <div className="pt-4">
+          <BannerSlider banners={banners} />
+        </div>
+      ) : null}
       <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-6">
         <h1 className="text-xl font-bold text-neutral-900">Kategori Produk</h1>
         <p className="mt-1 text-sm text-neutral-500">

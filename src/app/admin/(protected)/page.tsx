@@ -1,14 +1,17 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { CategoryManagement } from "@/components/admin/category-management";
+import { BannerManagement } from "@/components/admin/banner-management";
 
 export default async function AdminDashboardPage() {
-  const [categoryCount, productCount, outOfStockCount, testimonialCount] = await Promise.all([
-    prisma.category.count(),
-    prisma.product.count(),
-    prisma.product.count({ where: { inStock: false } }),
-    prisma.testimonial.count(),
-  ]);
+  const [categoryCount, productCount, outOfStockCount, testimonialCount, banners] =
+    await Promise.all([
+      prisma.category.count(),
+      prisma.product.count(),
+      prisma.product.count({ where: { inStock: false } }),
+      prisma.testimonial.count(),
+      prisma.banner.findMany({ orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }] }),
+    ]);
 
   return (
     <div className="space-y-6">
@@ -37,6 +40,8 @@ export default async function AdminDashboardPage() {
       </div>
 
       <CategoryManagement />
+
+      <BannerManagement initialBanners={banners} />
 
       <div className="flex items-center justify-between rounded-lg border border-neutral-200 bg-white p-4">
         <div>
