@@ -1,9 +1,11 @@
 "use client";
 
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import { StockBadge } from "@/components/stock-badge";
 import { buildWhatsappMessage } from "@/lib/whatsapp";
+import { toggleFavorite } from "@/lib/favorites";
+import { useFavorites } from "@/hooks/use-favorites";
 
 export type LightboxProduct = {
   id: string;
@@ -13,10 +15,28 @@ export type LightboxProduct = {
   imageUrl: string | null;
 };
 
+async function downloadImage(url: string, filename: string) {
+  try {
+    const res = await fetch(url);
+    const blob = await res.blob();
+    const objectUrl = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = objectUrl;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(objectUrl);
+  } catch {
+    window.open(url, "_blank", "noopener,noreferrer");
+  }
+}
+
 export function ProductLightbox({
   products,
   index,
   categoryName,
+  categorySlug,
   whatsappNumber,
   whatsappMessageTemplate,
   onClose,
@@ -25,12 +45,15 @@ export function ProductLightbox({
   products: LightboxProduct[];
   index: number;
   categoryName: string;
+  categorySlug: string;
   whatsappNumber: string | null;
   whatsappMessageTemplate: string | null;
   onClose: () => void;
   onNavigate: (nextIndex: number) => void;
 }) {
   const product = products[index];
+  const favorites = useFavorites();
+  const [downloading, setDownloading] = useState(false);
 
   const goPrev = useCallback(() => {
     onNavigate((index - 1 + products.length) % products.length);
@@ -51,6 +74,27 @@ export function ProductLightbox({
   }, [onClose, goPrev, goNext]);
 
   if (!product) return null;
+
+  const isFavorited = favorites.some((f) => f.id === product.id);
+
+  function handleToggleFavorite() {
+    toggleFavorite({
+      id: product.id,
+      name: product.name,
+      imageUrl: product.imageUrl,
+      inStock: product.inStock,
+      categorySlug,
+      categoryName,
+    });
+  }
+
+  async function handleDownload() {
+    if (!product.imageUrl || downloading) return;
+    setDownloading(true);
+    const ext = product.imageUrl.split(".").pop()?.split("?")[0] || "jpg";
+    await downloadImage(product.imageUrl, `${product.name}.${ext}`);
+    setDownloading(false);
+  }
 
   const waMessage = buildWhatsappMessage(whatsappMessageTemplate, {
     produk: product.name,
@@ -137,6 +181,51 @@ export function ProductLightbox({
         onClick={(e) => e.stopPropagation()}
       >
         <StockBadge inStock={product.inStock} />
+
+        <button
+          type="button"
+          onClick={handleToggleFavorite}
+          aria-pressed={isFavorited}
+          className={`flex cursor-pointer items-center gap-2 rounded-full border px-5 py-2.5 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white ${
+            isFavorited
+              ? "border-transparent bg-white text-red-600"
+              : "border-white/30 bg-transparent text-white hover:bg-white/10"
+          }`}
+        >
+          <svg
+            className="h-4 w-4"
+            fill={isFavorited ? "currentColor" : "none"}
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 20.364l-7.682-7.682a4.5 4.5 0 010-6.364z"
+            />
+          </svg>
+          {isFavorited ? "Favorit" : "Tambah Favorit"}
+        </button>
+
+        {product.imageUrl ? (
+          <button
+            type="button"
+            onClick={handleDownload}
+            disabled={downloading}
+            className="flex cursor-pointer items-center gap-2 rounded-full border border-white/30 bg-transparent px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3"
+              />
+            </svg>
+            {downloading ? "Mengunduh..." : "Download"}
+          </button>
+        ) : null}
+
         {waHref ? (
           <a
             href={waHref}

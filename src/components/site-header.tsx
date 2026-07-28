@@ -5,6 +5,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { SiteSidebar } from "@/components/site-sidebar";
+import { useFavorites } from "@/hooks/use-favorites";
 
 function SearchBox() {
   const pathname = usePathname();
@@ -12,8 +13,13 @@ function SearchBox() {
   const searchParams = useSearchParams();
 
   const isCategoryPage = pathname.startsWith("/kategori/");
-  const showSearch = pathname === "/" || isCategoryPage;
-  const placeholder = isCategoryPage ? "Cari produk..." : "Cari kategori...";
+  const isFavoritPage = pathname === "/favorit";
+  const showSearch = pathname === "/" || isCategoryPage || isFavoritPage;
+  const placeholder = isCategoryPage
+    ? "Cari produk..."
+    : isFavoritPage
+      ? "Cari produk favorit..."
+      : "Cari kategori...";
 
   const [value, setValue] = useState(searchParams.get("q") ?? "");
 
@@ -68,6 +74,7 @@ function SearchBox() {
 export function SiteHeader() {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const favorites = useFavorites();
 
   return (
     <header className="border-b border-neutral-200 bg-white">
@@ -77,6 +84,32 @@ export function SiteHeader() {
         </Link>
 
         <SearchBox key={pathname} />
+
+        <Link
+          href="/favorit"
+          aria-label={`Produk favorit${favorites.length > 0 ? ` (${favorites.length})` : ""}`}
+          aria-current={pathname === "/favorit" ? "page" : undefined}
+          className="relative flex shrink-0 cursor-pointer items-center justify-center rounded-full p-2 text-neutral-700 transition-colors hover:bg-neutral-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+        >
+          <svg
+            className="h-6 w-6"
+            fill={favorites.length > 0 ? "currentColor" : "none"}
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 20.364l-7.682-7.682a4.5 4.5 0 010-6.364z"
+            />
+          </svg>
+          {favorites.length > 0 ? (
+            <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-semibold text-white">
+              {favorites.length > 99 ? "99+" : favorites.length}
+            </span>
+          ) : null}
+        </Link>
 
         <button
           type="button"

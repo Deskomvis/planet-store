@@ -8,11 +8,13 @@ import { ProductLightbox, type LightboxProduct } from "@/components/product-ligh
 export function CategoryProductGrid({
   products,
   categoryName,
+  categorySlug,
   whatsappNumber,
   whatsappMessageTemplate,
 }: {
   products: LightboxProduct[];
   categoryName: string;
+  categorySlug: string;
   whatsappNumber: string | null;
   whatsappMessageTemplate: string | null;
 }) {
@@ -47,6 +49,7 @@ export function CategoryProductGrid({
           products={products}
           index={openIndex}
           categoryName={categoryName}
+          categorySlug={categorySlug}
           whatsappNumber={whatsappNumber}
           whatsappMessageTemplate={whatsappMessageTemplate}
           onClose={() => setOpenIndex(null)}

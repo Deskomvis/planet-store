@@ -89,6 +89,7 @@ export default async function CategoryPage({ params }: Props) {
             <CategoryProductGrid
               products={category.products}
               categoryName={category.name}
+              categorySlug={category.slug}
               whatsappNumber={whatsappNumber}
               whatsappMessageTemplate={whatsappMessageTemplate}
             />
