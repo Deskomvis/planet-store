@@ -6,12 +6,13 @@ const siteDescription =
   "Katalog produk Gudang Planet: kain, koko dewasa, gamis anak, dan perlengkapan sholat. Cek kategori dan produk terbaru kami.";
 
 // Falls back to Vercel's own production-domain env var so this doesn't need
-// to be hardcoded or kept in sync manually when the domain changes.
+// to be hardcoded or kept in sync manually when the domain changes. The
+// final fallback is the planned cataloggudang.id domain.
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL ??
   (process.env.VERCEL_PROJECT_PRODUCTION_URL
     ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-    : "https://creaxvo.com");
+    : "https://cataloggudang.id");
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
