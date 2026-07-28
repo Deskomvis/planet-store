@@ -83,7 +83,7 @@ export function SiteHeader() {
           href="/"
           className="flex shrink-0 items-center rounded-lg bg-neutral-900 px-2.5 py-1.5 transition-colors hover:bg-neutral-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
         >
-          <Image src="/logo-gudang.webp" alt="Planet Store" width={139} height={36} priority />
+          <Image src="/logo-gudang.webp" alt="Gudang Planet" width={139} height={36} priority />
         </Link>
 
         <SearchBox key={pathname} />

@@ -10,7 +10,7 @@ export const revalidate = 300; // ISR: re-generate at most every 5 minutes
 export const metadata: Metadata = {
   title: "Katalog Produk",
   description:
-    "Daftar kategori produk Planet Store: kain, koko dewasa, gamis anak, dan perlengkapan sholat.",
+    "Daftar kategori produk Gudang Planet: kain, koko dewasa, gamis anak, dan perlengkapan sholat.",
 };
 
 async function getCategories() {

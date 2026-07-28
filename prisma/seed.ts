@@ -54,7 +54,7 @@ async function main() {
     create: {
       email: adminEmail,
       passwordHash,
-      name: "Admin Planet Store",
+      name: "Admin Gudang Planet",
     },
   });
 

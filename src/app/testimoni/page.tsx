@@ -9,7 +9,7 @@ export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: "Testimoni Pelanggan",
-  description: "Kumpulan video testimoni pelanggan Planet Store.",
+  description: "Kumpulan video testimoni pelanggan Gudang Planet.",
 };
 
 async function getTestimonials() {
@@ -39,7 +39,7 @@ export default async function TestimoniPage() {
 
         <h1 className="mt-4 text-xl font-bold text-neutral-900">Testimoni Pelanggan</h1>
         <p className="mt-1 text-sm text-neutral-500">
-          {testimonials.length} video dari pelanggan Planet Store.
+          {testimonials.length} video dari pelanggan Gudang Planet.
         </p>
 
         {testimonials.length === 0 ? (

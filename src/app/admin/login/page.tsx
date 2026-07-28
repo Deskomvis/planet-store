@@ -42,7 +42,7 @@ export default function AdminLoginPage() {
     <main className="flex flex-1 items-center justify-center bg-neutral-50 px-4">
       <div className="w-full max-w-sm rounded-lg border border-neutral-200 bg-white p-6">
         <h1 className="text-lg font-bold text-neutral-900">Login Admin</h1>
-        <p className="mt-1 text-sm text-neutral-500">Planet Store — Dashboard Admin</p>
+        <p className="mt-1 text-sm text-neutral-500">Gudang Planet — Dashboard Admin</p>
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <div>

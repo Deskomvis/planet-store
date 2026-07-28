@@ -3,11 +3,11 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "Planet Store — Katalog Produk",
-    template: "%s | Planet Store",
+    default: "Gudang Planet — Katalog Produk",
+    template: "%s | Gudang Planet",
   },
   description:
-    "Katalog produk Planet Store: kain, koko dewasa, gamis anak, dan perlengkapan sholat. Cek kategori dan produk terbaru kami.",
+    "Katalog produk Gudang Planet: kain, koko dewasa, gamis anak, dan perlengkapan sholat. Cek kategori dan produk terbaru kami.",
 };
 
 export default function RootLayout({
