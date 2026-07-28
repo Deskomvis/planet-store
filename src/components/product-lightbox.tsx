@@ -138,13 +138,6 @@ export function ProductLightbox({
               Tidak ada gambar
             </div>
           )}
-
-          <div className="absolute left-4 top-4 max-w-[70%] rounded-lg bg-white/95 px-4 py-3">
-            <p className="text-sm font-semibold text-neutral-900">{product.name}</p>
-            {product.description ? (
-              <p className="mt-1 text-xs text-neutral-600">{product.description}</p>
-            ) : null}
-          </div>
         </div>
 
         {products.length > 1 ? (
