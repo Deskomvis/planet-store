@@ -49,7 +49,7 @@ export function CategoryForm({
         return;
       }
 
-      router.push("/admin/kategori");
+      router.push("/admin");
       router.refresh();
     } catch {
       setError("Terjadi kesalahan jaringan");

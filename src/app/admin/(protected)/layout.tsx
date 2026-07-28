@@ -20,8 +20,8 @@ export default async function AdminProtectedLayout({
               Admin Planet Store
             </Link>
             <nav className="flex items-center gap-4">
-              <Link href="/admin/kategori" className="text-sm font-medium text-neutral-600 hover:text-neutral-900">
-                Kategori
+              <Link href="/admin" className="text-sm font-medium text-neutral-600 hover:text-neutral-900">
+                Ringkasan
               </Link>
               <Link href="/admin/pengaturan" className="text-sm font-medium text-neutral-600 hover:text-neutral-900">
                 Pengaturan

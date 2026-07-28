@@ -21,8 +21,8 @@ export default async function EditCategoryPage({ params }: Props) {
     <div className="space-y-6">
       <div className="flex items-center gap-3">
         <Link
-          href="/admin/kategori"
-          aria-label="Kembali ke daftar kategori"
+          href="/admin"
+          aria-label="Kembali ke dashboard"
           className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full bg-white text-neutral-700 shadow-sm transition-colors hover:bg-neutral-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
         >
           <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

@@ -4,7 +4,7 @@ import { prisma } from "@/lib/db";
 import { DeleteButton } from "@/components/admin/delete-button";
 import { ReorderButtons } from "@/components/admin/reorder-buttons";
 
-export default async function AdminCategoriesPage() {
+export async function CategoryManagement() {
   const categories = await prisma.category.findMany({
     orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
     include: { _count: { select: { products: true } } },
