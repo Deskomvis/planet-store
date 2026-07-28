@@ -45,7 +45,7 @@ function FavoritContent() {
             {allFavorites.length === 0 ? "Belum ada produk favorit." : "Produk favorit tidak ditemukan."}
           </div>
         ) : (
-          <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+          <div className="mt-6 grid grid-cols-3 gap-1 sm:gap-3 md:grid-cols-4">
             {favorites.map((product) => (
               <div
                 key={product.id}
@@ -76,7 +76,7 @@ function FavoritContent() {
                         src={product.imageUrl}
                         alt={product.name}
                         fill
-                        sizes="(max-width: 640px) 50vw, 25vw"
+                        sizes="(max-width: 640px) 33vw, 25vw"
                         className="object-cover transition-transform duration-300 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
                       />
                     ) : (
@@ -85,14 +85,14 @@ function FavoritContent() {
                       </div>
                     )}
                   </div>
-                  <div className="p-3">
-                    <h3 className="line-clamp-1 text-sm font-semibold text-neutral-900">
+                  <div className="p-1.5 sm:p-3">
+                    <h3 className="line-clamp-1 text-xs font-semibold text-neutral-900 sm:text-sm">
                       {product.name}
                     </h3>
                     <p className="mt-0.5 line-clamp-1 text-xs text-neutral-500">
                       {product.categoryName}
                     </p>
-                    <div className="mt-2">
+                    <div className="mt-1 sm:mt-2">
                       <StockBadge inStock={product.inStock} />
                     </div>
                   </div>

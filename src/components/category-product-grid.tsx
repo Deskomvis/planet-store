@@ -31,7 +31,7 @@ export function CategoryProductGrid({
       {filtered.length === 0 ? (
         <p className="mt-8 text-sm text-neutral-500">Produk tidak ditemukan.</p>
       ) : (
-        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+        <div className="mt-6 grid grid-cols-3 gap-1 sm:gap-3 md:grid-cols-4">
           {filtered.map((product) => (
             <ProductCard
               key={product.id}

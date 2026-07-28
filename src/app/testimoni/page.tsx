@@ -47,7 +47,7 @@ export default async function TestimoniPage() {
             Belum ada testimoni.
           </div>
         ) : (
-          <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+          <div className="mt-6 grid grid-cols-3 gap-1 sm:gap-4 md:grid-cols-4">
             {testimonials.map((testimonial) => (
               <div
                 key={testimonial.id}
@@ -61,12 +61,16 @@ export default async function TestimoniPage() {
                   className={`w-full ${testimonial.format === "9:16" ? "aspect-[9/16]" : "aspect-[4/5]"} object-cover`}
                 />
                 {testimonial.title || testimonial.description ? (
-                  <div className="bg-white p-3">
+                  <div className="bg-white p-1.5 sm:p-3">
                     {testimonial.title ? (
-                      <p className="line-clamp-1 text-sm font-semibold text-neutral-900">{testimonial.title}</p>
+                      <p className="line-clamp-1 text-xs font-semibold text-neutral-900 sm:text-sm">
+                        {testimonial.title}
+                      </p>
                     ) : null}
                     {testimonial.description ? (
-                      <p className="mt-0.5 line-clamp-2 text-xs text-neutral-500">{testimonial.description}</p>
+                      <p className="mt-0.5 line-clamp-2 hidden text-xs text-neutral-500 sm:block">
+                        {testimonial.description}
+                      </p>
                     ) : null}
                   </div>
                 ) : null}

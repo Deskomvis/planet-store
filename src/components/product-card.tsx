@@ -24,7 +24,7 @@ export function ProductCard({
             src={imageUrl}
             alt={name}
             fill
-            sizes="(max-width: 640px) 50vw, 25vw"
+            sizes="(max-width: 640px) 33vw, 25vw"
             className="object-cover transition-transform duration-300 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
           />
         ) : (
@@ -33,9 +33,9 @@ export function ProductCard({
           </div>
         )}
       </div>
-      <div className="p-3">
-        <h3 className="line-clamp-1 text-sm font-semibold text-neutral-900">{name}</h3>
-        <div className="mt-2">
+      <div className="p-1.5 sm:p-3">
+        <h3 className="line-clamp-1 text-xs font-semibold text-neutral-900 sm:text-sm">{name}</h3>
+        <div className="mt-1 sm:mt-2">
           <StockBadge inStock={inStock} />
         </div>
       </div>
