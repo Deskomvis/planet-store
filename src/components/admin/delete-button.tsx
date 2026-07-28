@@ -1,20 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
+import { ConfirmDialog } from "@/components/admin/confirm-dialog";
 
 export function DeleteButton({
   url,
   confirmMessage,
+  className,
+  children,
+  onDeleted,
 }: {
   url: string;
   confirmMessage: string;
+  className?: string;
+  children?: ReactNode;
+  onDeleted?: () => void;
 }) {
   const router = useRouter();
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
   async function handleDelete() {
-    if (!confirm(confirmMessage)) return;
     setLoading(true);
     try {
       const res = await fetch(url, { method: "DELETE" });
@@ -23,19 +30,37 @@ export function DeleteButton({
         alert(data.error ?? "Gagal menghapus data");
         return;
       }
-      router.refresh();
+      setConfirmOpen(false);
+      if (onDeleted) {
+        onDeleted();
+      } else {
+        router.refresh();
+      }
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <button
-      onClick={handleDelete}
-      disabled={loading}
-      className="cursor-pointer text-sm font-medium text-red-600 transition-colors hover:text-red-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
-    >
-      {loading ? "Menghapus..." : "Hapus"}
-    </button>
+    <>
+      <button
+        type="button"
+        onClick={() => setConfirmOpen(true)}
+        className={
+          className ??
+          "cursor-pointer text-sm font-medium text-red-600 transition-colors hover:text-red-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+        }
+      >
+        {children ?? "Hapus"}
+      </button>
+
+      <ConfirmDialog
+        open={confirmOpen}
+        message={confirmMessage}
+        loading={loading}
+        onConfirm={handleDelete}
+        onCancel={() => setConfirmOpen(false)}
+      />
+    </>
   );
 }

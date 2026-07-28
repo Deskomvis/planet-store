@@ -10,7 +10,7 @@ import { useFavorites } from "@/hooks/use-favorites";
 export type LightboxProduct = {
   id: string;
   name: string;
-  description: string;
+  description: string | null;
   inStock: boolean;
   imageUrl: string | null;
 };
@@ -160,7 +160,9 @@ export function ProductLightbox({
 
           <div className="absolute left-4 top-4 max-w-[70%] rounded-lg bg-white/95 px-4 py-3">
             <p className="text-sm font-semibold text-neutral-900">{product.name}</p>
-            <p className="mt-1 text-xs text-neutral-600">{product.description}</p>
+            {product.description ? (
+              <p className="mt-1 text-xs text-neutral-600">{product.description}</p>
+            ) : null}
           </div>
         </div>
 

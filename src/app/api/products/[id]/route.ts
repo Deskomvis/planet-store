@@ -46,7 +46,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
     data: {
       name: parsed.data.name,
       slug,
-      description: parsed.data.description,
+      description: parsed.data.description || null,
       inStock: parsed.data.inStock ?? true,
       imageUrl: parsed.data.imageUrl || null,
       categoryId: parsed.data.categoryId,

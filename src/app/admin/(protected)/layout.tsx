@@ -23,9 +23,6 @@ export default async function AdminProtectedLayout({
               <Link href="/admin/kategori" className="text-sm font-medium text-neutral-600 hover:text-neutral-900">
                 Kategori
               </Link>
-              <Link href="/admin/produk" className="text-sm font-medium text-neutral-600 hover:text-neutral-900">
-                Produk
-              </Link>
               <Link href="/admin/pengaturan" className="text-sm font-medium text-neutral-600 hover:text-neutral-900">
                 Pengaturan
               </Link>

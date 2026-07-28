@@ -8,7 +8,7 @@ export const categorySchema = z.object({
 
 export const productSchema = z.object({
   name: z.string().trim().min(2, "Nama produk minimal 2 karakter").max(150),
-  description: z.string().trim().min(5, "Deskripsi minimal 5 karakter").max(2000),
+  description: z.string().trim().max(2000).optional().nullable(),
   inStock: z.boolean().optional().default(true),
   imageUrl: z.union([z.string().url("URL gambar tidak valid"), z.literal(""), z.null()]).optional(),
   categoryId: z.string().min(1, "Kategori wajib dipilih"),

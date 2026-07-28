@@ -35,12 +35,6 @@ export default async function AdminDashboardPage() {
         >
           Kelola Kategori
         </Link>
-        <Link
-          href="/admin/produk"
-          className="rounded border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-100"
-        >
-          Kelola Produk
-        </Link>
       </div>
     </div>
   );

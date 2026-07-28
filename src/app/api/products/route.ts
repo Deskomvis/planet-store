@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
     data: {
       name: parsed.data.name,
       slug,
-      description: parsed.data.description,
+      description: parsed.data.description || null,
       inStock: parsed.data.inStock ?? true,
       imageUrl: parsed.data.imageUrl || null,
       categoryId: parsed.data.categoryId,
