@@ -14,6 +14,13 @@ export const productSchema = z.object({
   categoryId: z.string().min(1, "Kategori wajib dipilih"),
 });
 
+export const testimonialSchema = z.object({
+  title: z.string().trim().max(150).optional().nullable(),
+  description: z.string().trim().max(2000).optional().nullable(),
+  format: z.enum(["9:16", "4:5"], { message: "Format wajib dipilih" }),
+  videoUrl: z.string().url("Video wajib diunggah"),
+});
+
 export const loginSchema = z.object({
   email: z.string().trim().email("Email tidak valid"),
   password: z.string().min(6, "Password minimal 6 karakter"),

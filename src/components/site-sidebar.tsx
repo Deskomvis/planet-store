@@ -129,6 +129,44 @@ export function SiteSidebar({ open, onClose }: { open: boolean; onClose: () => v
             </svg>
             Katalog
           </Link>
+
+          <Link
+            href="/favorit"
+            aria-current={pathname === "/favorit" ? "page" : undefined}
+            className={`mt-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 ${
+              pathname === "/favorit"
+                ? "bg-blue-200/70 text-neutral-900"
+                : "text-neutral-700 hover:bg-blue-100"
+            }`}
+          >
+            <svg className="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 20.364l-7.682-7.682a4.5 4.5 0 010-6.364z"
+              />
+            </svg>
+            Favorit
+          </Link>
+
+          <Link
+            href="/testimoni"
+            aria-current={pathname === "/testimoni" ? "page" : undefined}
+            className={`mt-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 ${
+              pathname === "/testimoni"
+                ? "bg-blue-200/70 text-neutral-900"
+                : "text-neutral-700 hover:bg-blue-100"
+            }`}
+          >
+            <svg className="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+              />
+            </svg>
+            Testimoni
+          </Link>
         </nav>
 
         <div className="mx-4 mt-4 h-px bg-blue-200" />
