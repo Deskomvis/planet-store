@@ -65,8 +65,7 @@ model Testimonial {
 
 // Singleton row (id = "settings") holding site-wide admin-configurable settings.
 model StoreSettings {
-  id                       String   @id @default("settings")
-  whatsappNumber           String?
-  whatsappMessageTemplate  String?
-  updatedAt                DateTime @updatedAt
+  id               String   @id @default("settings")
+  googleMapsEmbed  String?
+  updatedAt        DateTime @updatedAt
 }

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/require-admin";
 import { settingsSchema } from "@/lib/validation";
@@ -21,17 +22,15 @@ export async function PUT(request: NextRequest) {
     );
   }
 
-  const whatsappMessageTemplate = parsed.data.whatsappMessageTemplate?.trim() || null;
+  const googleMapsEmbed = parsed.data.googleMapsEmbed?.trim() || null;
 
   const settings = await prisma.storeSettings.upsert({
     where: { id: "settings" },
-    update: { whatsappNumber: parsed.data.whatsappNumber, whatsappMessageTemplate },
-    create: {
-      id: "settings",
-      whatsappNumber: parsed.data.whatsappNumber,
-      whatsappMessageTemplate,
-    },
+    update: { googleMapsEmbed },
+    create: { id: "settings", googleMapsEmbed },
   });
+
+  revalidatePath("/");
 
   return NextResponse.json({ settings });
 }

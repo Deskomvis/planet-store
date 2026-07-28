@@ -61,7 +61,7 @@ async function main() {
   await prisma.storeSettings.upsert({
     where: { id: "settings" },
     update: {},
-    create: { id: "settings", whatsappNumber: "6281234567890" },
+    create: { id: "settings" },
   });
 
   // Reset to the requested initial category collection (also removes demo products).

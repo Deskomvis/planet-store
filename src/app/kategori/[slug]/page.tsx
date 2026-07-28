@@ -18,14 +18,6 @@ async function getCategory(slug: string) {
   });
 }
 
-async function getWhatsappSettings() {
-  const settings = await prisma.storeSettings.findUnique({ where: { id: "settings" } });
-  return {
-    whatsappNumber: settings?.whatsappNumber ?? null,
-    whatsappMessageTemplate: settings?.whatsappMessageTemplate ?? null,
-  };
-}
-
 export async function generateStaticParams() {
   const categories = await prisma.category.findMany({ select: { slug: true } });
   return categories.map((c) => ({ slug: c.slug }));
@@ -47,10 +39,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function CategoryPage({ params }: Props) {
   const { slug } = await params;
-  const [category, { whatsappNumber, whatsappMessageTemplate }] = await Promise.all([
-    getCategory(slug),
-    getWhatsappSettings(),
-  ]);
+  const category = await getCategory(slug);
 
   if (!category) {
     notFound();
@@ -80,7 +69,6 @@ export default async function CategoryPage({ params }: Props) {
         </nav>
 
         <h1 className="mt-2 text-xl font-bold text-neutral-900">{category.name}</h1>
-        <p className="mt-1 text-sm text-neutral-500">{category.products.length} produk</p>
 
         {category.products.length === 0 ? (
           <p className="mt-8 text-sm text-neutral-500">Belum ada produk di kategori ini.</p>
@@ -90,8 +78,6 @@ export default async function CategoryPage({ params }: Props) {
               products={category.products}
               categoryName={category.name}
               categorySlug={category.slug}
-              whatsappNumber={whatsappNumber}
-              whatsappMessageTemplate={whatsappMessageTemplate}
             />
           </Suspense>
         )}

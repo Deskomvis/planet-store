@@ -8,10 +8,7 @@ export default async function AdminSettingsPage() {
     <div>
       <h1 className="text-xl font-bold text-neutral-900">Pengaturan</h1>
       <div className="mt-6">
-        <SettingsForm
-          initialNumber={settings?.whatsappNumber ?? ""}
-          initialTemplate={settings?.whatsappMessageTemplate ?? ""}
-        />
+        <SettingsForm initialGoogleMapsEmbed={settings?.googleMapsEmbed ?? ""} />
       </div>
     </div>
   );

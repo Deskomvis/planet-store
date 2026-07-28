@@ -27,9 +27,5 @@ export const loginSchema = z.object({
 });
 
 export const settingsSchema = z.object({
-  whatsappNumber: z
-    .string()
-    .trim()
-    .regex(/^[0-9]{8,15}$/, "Nomor WhatsApp harus angka saja, format 62xxxxxxxxxx"),
-  whatsappMessageTemplate: z.string().trim().max(1000).optional().nullable(),
+  googleMapsEmbed: z.string().trim().max(3000).optional().nullable(),
 });

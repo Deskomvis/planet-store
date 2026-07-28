@@ -2,9 +2,9 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { StockBadge } from "@/components/stock-badge";
-import { buildWhatsappMessage } from "@/lib/whatsapp";
 import { toggleFavorite } from "@/lib/favorites";
 import { useFavorites } from "@/hooks/use-favorites";
+import { downloadFile, filenameFromUrl, shareImages } from "@/lib/share";
 
 export type LightboxProduct = {
   id: string;
@@ -14,45 +14,25 @@ export type LightboxProduct = {
   imageUrl: string | null;
 };
 
-async function downloadImage(url: string, filename: string) {
-  try {
-    const res = await fetch(url);
-    const blob = await res.blob();
-    const objectUrl = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = objectUrl;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(objectUrl);
-  } catch {
-    window.open(url, "_blank", "noopener,noreferrer");
-  }
-}
-
 export function ProductLightbox({
   products,
   index,
-  categoryName,
-  categorySlug,
-  whatsappNumber,
-  whatsappMessageTemplate,
   onClose,
   onNavigate,
+  categorySlug,
+  categoryName,
 }: {
   products: LightboxProduct[];
   index: number;
-  categoryName: string;
-  categorySlug: string;
-  whatsappNumber: string | null;
-  whatsappMessageTemplate: string | null;
   onClose: () => void;
   onNavigate: (nextIndex: number) => void;
+  categorySlug: string;
+  categoryName: string;
 }) {
   const product = products[index];
   const favorites = useFavorites();
   const [downloading, setDownloading] = useState(false);
+  const [sharing, setSharing] = useState(false);
 
   const goPrev = useCallback(() => {
     onNavigate((index - 1 + products.length) % products.length);
@@ -90,18 +70,22 @@ export function ProductLightbox({
   async function handleDownload() {
     if (!product.imageUrl || downloading) return;
     setDownloading(true);
-    const ext = product.imageUrl.split(".").pop()?.split("?")[0] || "jpg";
-    await downloadImage(product.imageUrl, `${product.name}.${ext}`);
+    await downloadFile(product.imageUrl, filenameFromUrl(product.imageUrl, product.name));
     setDownloading(false);
   }
 
-  const waMessage = buildWhatsappMessage(whatsappMessageTemplate, {
-    produk: product.name,
-    kategori: categoryName,
-  });
-  const waHref = whatsappNumber
-    ? `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(waMessage)}`
-    : null;
+  async function handleShare() {
+    if (!product.imageUrl || sharing) return;
+    setSharing(true);
+    const result = await shareImages(
+      [{ url: product.imageUrl, filename: filenameFromUrl(product.imageUrl, product.name) }],
+      product.name
+    );
+    if (result === "unsupported") {
+      await handleDownload();
+    }
+    setSharing(false);
+  }
 
   return (
     <div
@@ -225,15 +209,22 @@ export function ProductLightbox({
           </button>
         ) : null}
 
-        {waHref ? (
-          <a
-            href={waHref}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex cursor-pointer items-center gap-2 rounded-full bg-green-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-green-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+        {product.imageUrl ? (
+          <button
+            type="button"
+            onClick={handleShare}
+            disabled={sharing}
+            aria-label="Bagikan gambar"
+            className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-white/30 bg-transparent text-white transition-colors hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Share ke WhatsApp Admin
-          </a>
+            <svg className="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M8.684 13.342a3 3 0 100-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.368-2.684 3 3 0 00-5.368 2.684zm0 8a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
+              />
+            </svg>
+          </button>
         ) : null}
       </div>
     </div>
