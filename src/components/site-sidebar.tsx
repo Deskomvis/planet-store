@@ -98,7 +98,7 @@ export function SiteSidebar({ open, onClose }: { open: boolean; onClose: () => v
         <div className="flex items-center justify-between px-4 py-4">
           <Link
             href="/"
-            className="flex shrink-0 items-center rounded-lg bg-neutral-900 px-2.5 py-1.5 transition-colors hover:bg-neutral-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+            className="flex shrink-0 items-center rounded-lg px-2.5 py-1.5 transition-opacity hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
           >
             <Image src="/logo-gp-black.webp" alt="Gudang Planet" width={170} height={51} priority />
           </Link>
