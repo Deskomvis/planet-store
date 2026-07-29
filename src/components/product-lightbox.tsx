@@ -95,20 +95,23 @@ export function ProductLightbox({
       className="fixed inset-0 z-50 flex flex-col bg-black/90 p-4"
       onClick={onClose}
     >
-      <div className="flex items-center justify-end" onClick={(e) => e.stopPropagation()}>
-        <span className="rounded-full bg-white/10 px-3 py-1 text-sm text-white">
+      <div className="flex items-center justify-end">
+        <span
+          className="rounded-full bg-white/10 px-3 py-1 text-sm text-white"
+          onClick={(e) => e.stopPropagation()}
+        >
           {index + 1} / {products.length}
         </span>
       </div>
 
-      <div
-        className="relative mx-auto flex w-full max-w-2xl flex-1 items-center justify-center"
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className="relative mx-auto flex w-full max-w-2xl flex-1 items-center justify-center">
         {products.length > 1 ? (
           <button
             type="button"
-            onClick={goPrev}
+            onClick={(e) => {
+              e.stopPropagation();
+              goPrev();
+            }}
             aria-label="Sebelumnya"
             className="absolute left-0 z-10 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:-left-14"
           >
@@ -116,12 +119,15 @@ export function ProductLightbox({
           </button>
         ) : null}
 
-        <div className="relative max-h-[70vh] w-fit max-w-full overflow-hidden rounded-xl bg-white">
+        <div
+          className="relative max-h-[70vh] w-fit max-w-full overflow-hidden rounded-xl bg-white"
+          onClick={(e) => e.stopPropagation()}
+        >
           <button
             type="button"
             onClick={onClose}
             aria-label="Tutup"
-            className="absolute right-3 top-3 z-10 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-black/5 text-neutral-700 transition-colors hover:bg-black/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+            className="absolute right-3 top-3 z-10 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-black/40 text-white transition-colors hover:bg-black/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
           >
             ✕
           </button>
@@ -143,7 +149,10 @@ export function ProductLightbox({
         {products.length > 1 ? (
           <button
             type="button"
-            onClick={goNext}
+            onClick={(e) => {
+              e.stopPropagation();
+              goNext();
+            }}
             aria-label="Berikutnya"
             className="absolute right-0 z-10 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:-right-14"
           >
@@ -154,7 +163,10 @@ export function ProductLightbox({
 
       <div
         className="mx-auto flex w-full max-w-2xl flex-wrap items-center justify-center gap-3 pb-2 pt-4"
-        onClick={(e) => e.stopPropagation()}
+        onClick={(e) => {
+          if (e.target === e.currentTarget) return;
+          e.stopPropagation();
+        }}
       >
         <StockBadge inStock={product.inStock} />
 
