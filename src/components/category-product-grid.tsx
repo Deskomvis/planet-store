@@ -50,7 +50,8 @@ export function CategoryProductGrid({
       selectedProducts.map((p) => ({
         url: p.imageUrl!,
         filename: filenameFromUrl(p.imageUrl!, p.name),
-      }))
+      })),
+      categoryName
     );
     setDownloading(false);
   }

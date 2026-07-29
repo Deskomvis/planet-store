@@ -67,7 +67,8 @@ export function CategoryProductsManager({
         selected.map((product) => {
           const ext = product.imageUrl!.split(".").pop()?.split("?")[0] || "jpg";
           return { url: product.imageUrl!, filename: `${product.name}.${ext}` };
-        })
+        }),
+        categoryName
       );
     } finally {
       setBulkDownloading(false);

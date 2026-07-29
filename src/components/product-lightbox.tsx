@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { StockBadge } from "@/components/stock-badge";
 import { toggleFavorite } from "@/lib/favorites";
 import { useFavorites } from "@/hooks/use-favorites";
-import { downloadFile, filenameFromUrl, shareImages } from "@/lib/share";
+import { downloadFile, filenameFromUrl } from "@/lib/share";
 
 export type LightboxProduct = {
   id: string;
@@ -32,7 +32,6 @@ export function ProductLightbox({
   const product = products[index];
   const favorites = useFavorites();
   const [downloading, setDownloading] = useState(false);
-  const [sharing, setSharing] = useState(false);
 
   const goPrev = useCallback(() => {
     onNavigate((index - 1 + products.length) % products.length);
@@ -74,19 +73,6 @@ export function ProductLightbox({
     setDownloading(false);
   }
 
-  async function handleShare() {
-    if (!product.imageUrl || sharing) return;
-    setSharing(true);
-    const result = await shareImages(
-      [{ url: product.imageUrl, filename: filenameFromUrl(product.imageUrl, product.name) }],
-      product.name
-    );
-    if (result === "unsupported") {
-      await handleDownload();
-    }
-    setSharing(false);
-  }
-
   return (
     <div
       role="dialog"
@@ -113,7 +99,7 @@ export function ProductLightbox({
               goPrev();
             }}
             aria-label="Sebelumnya"
-            className="absolute left-0 z-10 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:-left-14"
+            className="absolute left-1 z-10 flex h-14 w-14 cursor-pointer items-center justify-center rounded-full bg-white/10 text-3xl text-white transition-colors hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:-left-14 sm:h-10 sm:w-10 sm:text-base"
           >
             ‹
           </button>
@@ -154,7 +140,7 @@ export function ProductLightbox({
               goNext();
             }}
             aria-label="Berikutnya"
-            className="absolute right-0 z-10 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:-right-14"
+            className="absolute right-1 z-10 flex h-14 w-14 cursor-pointer items-center justify-center rounded-full bg-white/10 text-3xl text-white transition-colors hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:-right-14 sm:h-10 sm:w-10 sm:text-base"
           >
             ›
           </button>
@@ -211,24 +197,6 @@ export function ProductLightbox({
               />
             </svg>
             {downloading ? "Mengunduh..." : "Download"}
-          </button>
-        ) : null}
-
-        {product.imageUrl ? (
-          <button
-            type="button"
-            onClick={handleShare}
-            disabled={sharing}
-            aria-label="Bagikan gambar"
-            className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-white/30 bg-transparent text-white transition-colors hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <svg className="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M8.684 13.342a3 3 0 100-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.368-2.684 3 3 0 00-5.368 2.684zm0 8a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
-              />
-            </svg>
           </button>
         ) : null}
       </div>
