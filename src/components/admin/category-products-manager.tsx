@@ -7,23 +7,7 @@ import { StockBadge } from "@/components/stock-badge";
 import { DeleteButton } from "@/components/admin/delete-button";
 import { ConfirmDialog } from "@/components/admin/confirm-dialog";
 import { ProductEditDialog, type ManagedProduct } from "@/components/admin/product-edit-dialog";
-
-async function downloadFile(url: string, filename: string) {
-  try {
-    const res = await fetch(url);
-    const blob = await res.blob();
-    const objectUrl = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = objectUrl;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(objectUrl);
-  } catch {
-    window.open(url, "_blank", "noopener,noreferrer");
-  }
-}
+import { downloadFile } from "@/lib/share";
 
 export function CategoryProductsManager({
   categoryId,

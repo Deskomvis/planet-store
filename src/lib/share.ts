@@ -9,21 +9,19 @@ export function filenameFromUrl(url: string, fallbackName: string): string {
   return `${fallbackName}.${ext}`;
 }
 
+/**
+ * Downloads a file straight to disk, no new tab. Routes through our own
+ * /api/download so cross-origin images (R2, or any URL an admin pastes in)
+ * don't need CORS headers for the browser to force a download instead of
+ * just navigating to the image.
+ */
 export async function downloadFile(url: string, filename: string) {
-  try {
-    const res = await fetch(url);
-    const blob = await res.blob();
-    const objectUrl = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = objectUrl;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(objectUrl);
-  } catch {
-    window.open(url, "_blank", "noopener,noreferrer");
-  }
+  const a = document.createElement("a");
+  a.href = `/api/download?url=${encodeURIComponent(url)}&filename=${encodeURIComponent(filename)}`;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
 }
 
 /** Shares one or more images via the native share sheet when available. */
