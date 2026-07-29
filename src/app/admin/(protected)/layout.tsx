@@ -17,7 +17,7 @@ export default async function AdminProtectedLayout({
           <div className="flex items-center gap-6">
             <Link href="/admin" className="flex items-center gap-2.5 text-lg font-bold text-neutral-900">
               <span className="flex shrink-0 items-center rounded-lg bg-neutral-900 px-2 py-1">
-                <Image src="/logo-gudang.webp" alt="Gudang Planet" width={108} height={28} />
+                <Image src="/logo-gp-black.webp" alt="Gudang Planet" width={130} height={39} />
               </span>
               Admin Gudang Planet
             </Link>

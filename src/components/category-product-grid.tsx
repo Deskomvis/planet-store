@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { ProductCard } from "@/components/product-card";
 import { ProductLightbox, type LightboxProduct } from "@/components/product-lightbox";
-import { downloadFile, filenameFromUrl, shareToWhatsApp } from "@/lib/share";
+import { downloadFile, filenameFromUrl, shareImages } from "@/lib/share";
 
 export function CategoryProductGrid({
   products,
@@ -54,13 +54,16 @@ export function CategoryProductGrid({
 
   async function handleBulkShare() {
     setSharing(true);
-    await shareToWhatsApp(
+    const result = await shareImages(
       selectedProducts.map((p) => ({
         url: p.imageUrl!,
         filename: filenameFromUrl(p.imageUrl!, p.name),
       })),
-      `${selectedProducts.length} produk ${categoryName} (gambar sudah diunduh, lampirkan di chat ini)`
+      `${selectedProducts.length} produk ${categoryName}`
     );
+    if (result === "unsupported") {
+      await handleBulkDownload();
+    }
     setSharing(false);
   }
 
@@ -138,8 +141,12 @@ export function CategoryProductGrid({
               disabled={sharing}
               className="flex cursor-pointer items-center gap-1.5 rounded-full bg-white/10 px-3.5 py-1.5 text-sm font-medium text-white transition-colors hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:cursor-not-allowed disabled:opacity-50"
             >
-              <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.85.5 3.58 1.36 5.07L2 22l5.25-1.38a9.9 9.9 0 004.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.86 9.86 0 0012.04 2zm5.71 14.13c-.24.68-1.4 1.32-1.93 1.4-.5.08-1.11.11-1.79-.11-.41-.13-.94-.3-1.62-.6-2.86-1.24-4.72-4.12-4.86-4.31-.14-.19-1.16-1.55-1.16-2.96 0-1.41.74-2.1 1-2.39.26-.29.57-.36.76-.36.19 0 .38 0 .55.01.18.01.42-.07.65.5.24.58.81 2 .88 2.15.07.15.12.32.02.51-.1.19-.15.31-.29.48-.15.17-.31.38-.44.51-.15.15-.31.31-.13.61.18.3.8 1.32 1.72 2.14 1.18 1.05 2.18 1.38 2.48 1.53.3.15.48.13.66-.08.18-.21.76-.88.96-1.18.2-.3.4-.25.67-.15.28.1 1.75.83 2.05.98.3.15.5.22.57.35.08.13.08.75-.16 1.43z" />
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M8.684 13.342a3 3 0 100-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.368-2.684 3 3 0 00-5.368 2.684zm0 8a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
+                />
               </svg>
               {sharing ? "Membagikan..." : "Share"}
             </button>
