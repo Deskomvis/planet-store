@@ -7,7 +7,7 @@ import { StockBadge } from "@/components/stock-badge";
 import { DeleteButton } from "@/components/admin/delete-button";
 import { ConfirmDialog } from "@/components/admin/confirm-dialog";
 import { ProductEditDialog, type ManagedProduct } from "@/components/admin/product-edit-dialog";
-import { downloadFile } from "@/lib/share";
+import { downloadFiles } from "@/lib/share";
 
 export function CategoryProductsManager({
   categoryId,
@@ -63,10 +63,12 @@ export function CategoryProductsManager({
     setBulkDownloading(true);
     try {
       const selected = products.filter((p) => selectedIds.has(p.id) && p.imageUrl);
-      for (const product of selected) {
-        const ext = product.imageUrl!.split(".").pop()?.split("?")[0] || "jpg";
-        await downloadFile(product.imageUrl!, `${product.name}.${ext}`);
-      }
+      await downloadFiles(
+        selected.map((product) => {
+          const ext = product.imageUrl!.split(".").pop()?.split("?")[0] || "jpg";
+          return { url: product.imageUrl!, filename: `${product.name}.${ext}` };
+        })
+      );
     } finally {
       setBulkDownloading(false);
     }

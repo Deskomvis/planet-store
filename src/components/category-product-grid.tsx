@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { ProductCard } from "@/components/product-card";
 import { ProductLightbox, type LightboxProduct } from "@/components/product-lightbox";
-import { downloadFile, filenameFromUrl, shareImages } from "@/lib/share";
+import { downloadFiles, filenameFromUrl, shareImages } from "@/lib/share";
 
 export function CategoryProductGrid({
   products,
@@ -46,9 +46,12 @@ export function CategoryProductGrid({
 
   async function handleBulkDownload() {
     setDownloading(true);
-    for (const product of selectedProducts) {
-      await downloadFile(product.imageUrl!, filenameFromUrl(product.imageUrl!, product.name));
-    }
+    await downloadFiles(
+      selectedProducts.map((p) => ({
+        url: p.imageUrl!,
+        filename: filenameFromUrl(p.imageUrl!, p.name),
+      }))
+    );
     setDownloading(false);
   }
 

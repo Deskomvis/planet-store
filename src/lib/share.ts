@@ -24,6 +24,19 @@ export async function downloadFile(url: string, filename: string) {
   a.remove();
 }
 
+/**
+ * Downloads several files straight to disk, one by one. A short delay
+ * between each click is needed because browsers throttle/block a burst of
+ * same-tick downloads as a "multiple downloads" popup rather than saving
+ * them all.
+ */
+export async function downloadFiles(files: { url: string; filename: string }[]) {
+  for (const [i, file] of files.entries()) {
+    if (i > 0) await new Promise((resolve) => setTimeout(resolve, 300));
+    await downloadFile(file.url, file.filename);
+  }
+}
+
 /** Shares one or more images via the native share sheet when available. */
 export async function shareImages(
   images: { url: string; filename: string }[],
