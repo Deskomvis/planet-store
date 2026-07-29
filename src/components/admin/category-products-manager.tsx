@@ -247,10 +247,7 @@ export function CategoryProductsManager({
                   ) : null}
                 </div>
                 <div className="p-2.5">
-                  <p className="line-clamp-1 text-sm font-semibold text-neutral-900">{product.name}</p>
-                  <div className="mt-1.5">
-                    <StockBadge inStock={product.inStock} />
-                  </div>
+                  <StockBadge inStock={product.inStock} />
                 </div>
               </button>
 
