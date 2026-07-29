@@ -57,10 +57,7 @@ export function ProductCard({
         ) : null}
       </div>
       <div className="p-1.5 sm:p-3">
-        <h3 className="line-clamp-1 text-xs font-semibold text-neutral-900 sm:text-sm">{name}</h3>
-        <div className="mt-1 sm:mt-2">
-          <StockBadge inStock={inStock} />
-        </div>
+        <StockBadge inStock={inStock} />
       </div>
     </button>
   );
