@@ -9,30 +9,45 @@ export function filenameFromUrl(url: string, fallbackName: string): string {
   return `${fallbackName}.${ext}`;
 }
 
+function wait(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 /**
  * Downloads a file straight to disk, no new tab. Routes through our own
  * /api/download so cross-origin images (R2, or any URL an admin pastes in)
  * don't need CORS headers for the browser to force a download instead of
- * just navigating to the image.
+ * just navigating to the image. Fetches the bytes first (instead of just
+ * pointing an anchor at the URL) so the caller can actually wait for this
+ * file to finish downloading before starting the next one.
  */
 export async function downloadFile(url: string, filename: string) {
+  const res = await fetch(`/api/download?url=${encodeURIComponent(url)}&filename=${encodeURIComponent(filename)}`);
+  if (!res.ok) return;
+
+  const blob = await res.blob();
+  const objectUrl = URL.createObjectURL(blob);
   const a = document.createElement("a");
-  a.href = `/api/download?url=${encodeURIComponent(url)}&filename=${encodeURIComponent(filename)}`;
+  a.href = objectUrl;
   a.download = filename;
   document.body.appendChild(a);
   a.click();
   a.remove();
+  // Revoking too soon can cancel the save on some browsers before they've
+  // actually read the blob.
+  setTimeout(() => URL.revokeObjectURL(objectUrl), 4000);
 }
 
 /**
- * Downloads several files straight to disk, one by one. A short delay
- * between each click is needed because browsers throttle/block a burst of
- * same-tick downloads as a "multiple downloads" popup rather than saving
- * them all.
+ * Downloads several files straight to disk, one at a time: each file's
+ * bytes are fully fetched before its save is triggered, and there's a
+ * pause after each save so the browser's download/save UI has time to
+ * settle before the next one starts — some mobile browsers silently drop
+ * a save that's triggered while the previous one is still being handled.
  */
 export async function downloadFiles(files: { url: string; filename: string }[]) {
   for (const [i, file] of files.entries()) {
-    if (i > 0) await new Promise((resolve) => setTimeout(resolve, 300));
+    if (i > 0) await wait(1200);
     await downloadFile(file.url, file.filename);
   }
 }
