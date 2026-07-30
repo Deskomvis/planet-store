@@ -7,7 +7,7 @@ import { StockBadge } from "@/components/stock-badge";
 import { DeleteButton } from "@/components/admin/delete-button";
 import { ConfirmDialog } from "@/components/admin/confirm-dialog";
 import { ProductEditDialog, type ManagedProduct } from "@/components/admin/product-edit-dialog";
-import { downloadFiles } from "@/lib/share";
+import { BulkDownloadDialog } from "@/components/bulk-download-dialog";
 
 export function CategoryProductsManager({
   categoryId,
@@ -29,7 +29,9 @@ export function CategoryProductsManager({
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [confirmBulkDelete, setConfirmBulkDelete] = useState(false);
   const [bulkDeleting, setBulkDeleting] = useState(false);
-  const [bulkDownloading, setBulkDownloading] = useState(false);
+  const [downloadDialogFiles, setDownloadDialogFiles] = useState<{ url: string; filename: string }[] | null>(
+    null
+  );
 
   function exitSelectMode() {
     setSelectMode(false);
@@ -59,19 +61,14 @@ export function CategoryProductsManager({
     }
   }
 
-  async function handleBulkDownload() {
-    setBulkDownloading(true);
-    try {
-      const selected = products.filter((p) => selectedIds.has(p.id) && p.imageUrl);
-      await downloadFiles(
-        selected.map((product) => {
-          const ext = product.imageUrl!.split(".").pop()?.split("?")[0] || "jpg";
-          return { url: product.imageUrl!, filename: `${product.name}.${ext}` };
-        })
-      );
-    } finally {
-      setBulkDownloading(false);
-    }
+  function handleBulkDownload() {
+    const selected = products.filter((p) => selectedIds.has(p.id) && p.imageUrl);
+    setDownloadDialogFiles(
+      selected.map((product) => {
+        const ext = product.imageUrl!.split(".").pop()?.split("?")[0] || "jpg";
+        return { url: product.imageUrl!, filename: `${product.name}.${ext}` };
+      })
+    );
   }
 
   async function handleFilesSelected(e: ChangeEvent<HTMLInputElement>) {
@@ -320,8 +317,7 @@ export function CategoryProductsManager({
             <button
               type="button"
               onClick={handleBulkDownload}
-              disabled={bulkDownloading}
-              className="flex cursor-pointer items-center gap-1.5 rounded-full bg-white/10 px-3.5 py-1.5 text-sm font-medium text-white transition-colors hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex cursor-pointer items-center gap-1.5 rounded-full bg-white/10 px-3.5 py-1.5 text-sm font-medium text-white transition-colors hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path
@@ -330,7 +326,7 @@ export function CategoryProductsManager({
                   d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3"
                 />
               </svg>
-              {bulkDownloading ? "Mengunduh..." : "Download"}
+              Download
             </button>
           </div>
         </div>
@@ -343,6 +339,10 @@ export function CategoryProductsManager({
         onConfirm={handleBulkDelete}
         onCancel={() => setConfirmBulkDelete(false)}
       />
+
+      {downloadDialogFiles ? (
+        <BulkDownloadDialog files={downloadDialogFiles} onClose={() => setDownloadDialogFiles(null)} />
+      ) : null}
     </div>
   );
 }
