@@ -13,10 +13,13 @@ function getSecretKey() {
   return new TextEncoder().encode(secret);
 }
 
+export type AdminRole = "admin" | "input";
+
 export type SessionPayload = {
   adminId: string;
   email: string;
   name: string;
+  role: AdminRole;
 };
 
 export async function createSession(payload: SessionPayload) {

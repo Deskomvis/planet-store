@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/db";
-import { createSession } from "@/lib/session";
+import { createSession, type AdminRole } from "@/lib/session";
 import { loginSchema } from "@/lib/validation";
 
 export async function POST(request: NextRequest) {
@@ -27,7 +27,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Email atau password salah" }, { status: 401 });
   }
 
-  await createSession({ adminId: admin.id, email: admin.email, name: admin.name });
+  await createSession({
+    adminId: admin.id,
+    email: admin.email,
+    name: admin.name,
+    role: admin.role as AdminRole,
+  });
 
   return NextResponse.json({ ok: true });
 }

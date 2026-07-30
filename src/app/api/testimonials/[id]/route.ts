@@ -7,7 +7,7 @@ import { testimonialSchema } from "@/lib/validation";
 type Params = { params: Promise<{ id: string }> };
 
 export async function PUT(request: NextRequest, { params }: Params) {
-  const { response } = await requireAdmin();
+  const { response } = await requireAdmin({ role: "admin" });
   if (response) return response;
 
   const { id } = await params;
@@ -36,7 +36,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
 }
 
 export async function DELETE(_request: NextRequest, { params }: Params) {
-  const { response } = await requireAdmin();
+  const { response } = await requireAdmin({ role: "admin" });
   if (response) return response;
 
   const { id } = await params;

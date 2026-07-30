@@ -1,9 +1,25 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
+import { getSession } from "@/lib/session";
 import { CategoryManagement } from "@/components/admin/category-management";
 import { BannerManagement } from "@/components/admin/banner-management";
 
 export default async function AdminDashboardPage() {
+  const session = await getSession();
+  const isFullAdmin = session?.role === "admin";
+
+  if (!isFullAdmin) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-xl font-bold text-neutral-900">Kategori & Produk</h1>
+          <p className="mt-1 text-sm text-neutral-500">Kelola kategori dan produk katalog Gudang Planet.</p>
+        </div>
+        <CategoryManagement />
+      </div>
+    );
+  }
+
   const [categoryCount, productCount, outOfStockCount, testimonialCount, banners] =
     await Promise.all([
       prisma.category.count(),

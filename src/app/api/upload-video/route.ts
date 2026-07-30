@@ -12,7 +12,7 @@ const ALLOWED_TYPES: Record<string, string> = {
 const MAX_SIZE_BYTES = 100 * 1024 * 1024; // 100MB
 
 export async function POST(request: NextRequest) {
-  const { response } = await requireAdmin();
+  const { response } = await requireAdmin({ role: "admin" });
   if (response) return response;
 
   const body = await request.json().catch(() => null);

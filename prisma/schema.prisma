@@ -46,6 +46,8 @@ model AdminUser {
   email        String   @unique
   passwordHash String
   name         String
+  // "admin" has full access; "input" is restricted to category/product CRUD.
+  role         String   @default("admin")
   createdAt    DateTime @default(now())
 }
 

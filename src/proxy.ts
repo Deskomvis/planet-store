@@ -3,6 +3,11 @@ import { jwtVerify } from "jose";
 
 const COOKIE_NAME = "admin_session";
 
+// Routes the restricted "input" role (category/product CRUD only) may not
+// visit, even with a valid session — kept in sync with the API-level
+// requireAdmin({ role: "admin" }) checks on banners/testimonials/settings.
+const ADMIN_ONLY_PATHS = ["/admin/testimoni", "/admin/pengaturan"];
+
 function getSecretKey() {
   return new TextEncoder().encode(process.env.SESSION_SECRET);
 }
@@ -21,7 +26,13 @@ export async function proxy(request: NextRequest) {
   }
 
   try {
-    await jwtVerify(token, getSecretKey());
+    const { payload } = await jwtVerify(token, getSecretKey());
+    const role = (payload as { role?: string }).role;
+
+    if (role === "input" && ADMIN_ONLY_PATHS.some((path) => pathname.startsWith(path))) {
+      return NextResponse.redirect(new URL("/admin", request.url));
+    }
+
     return NextResponse.next();
   } catch {
     return NextResponse.redirect(new URL("/admin/login", request.url));

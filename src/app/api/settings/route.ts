@@ -10,7 +10,7 @@ export async function GET() {
 }
 
 export async function PUT(request: NextRequest) {
-  const { response } = await requireAdmin();
+  const { response } = await requireAdmin({ role: "admin" });
   if (response) return response;
 
   const body = await request.json().catch(() => null);
