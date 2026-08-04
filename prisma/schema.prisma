@@ -83,9 +83,9 @@ model StoreSettings {
   updatedAt        DateTime @updatedAt
 }
 
-// Singleton row (id = "special-edition") for the editable premium landing page.
+// Reusable premium landing pages managed through the Special Edition page builder.
 model SpecialEditionPage {
-  id          String   @id @default("special-edition")
+  id          String   @id @default(cuid())
   slug        String   @unique
   title       String
   eyebrow     String?

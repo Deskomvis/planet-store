@@ -67,8 +67,17 @@ export function SpecialEditionEditor({ initialValue, pageId }: { initialValue: S
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(value),
       });
-      const data = await response.json();
+      const responseText = await response.text();
+      let data: { error?: string; page?: { id: string } } = {};
+      if (responseText) {
+        try {
+          data = JSON.parse(responseText) as typeof data;
+        } catch {
+          throw new Error("Server mengirim respons yang tidak valid. Silakan coba lagi.");
+        }
+      }
       if (!response.ok) throw new Error(data.error ?? "Gagal menyimpan halaman");
+      if (!data.page?.id) throw new Error("Halaman tersimpan tanpa ID yang valid");
       setMessage("Halaman Special Edition berhasil disimpan.");
       if (!pageId) router.replace(`/admin/special-edition/${data.page.id}`);
       else router.refresh();
