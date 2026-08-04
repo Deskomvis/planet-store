@@ -12,6 +12,7 @@ export function SiteSidebar({ open, onClose }: { open: boolean; onClose: () => v
   const pathname = usePathname();
   const [categories, setCategories] = useState<CategoryItem[]>([]);
   const [specialEditions, setSpecialEditions] = useState<SpecialEditionItem[]>([]);
+  const [navigationLoaded, setNavigationLoaded] = useState(false);
   const [specialOpen, setSpecialOpen] = useState(pathname.startsWith("/special-edition"));
   const [query, setQuery] = useState("");
   const closeButtonRef = useRef<HTMLButtonElement>(null);
@@ -19,17 +20,17 @@ export function SiteSidebar({ open, onClose }: { open: boolean; onClose: () => v
   const triggerRef = useRef<Element | null>(null);
 
   useEffect(() => {
-    if (!open || categories.length > 0) return;
-    Promise.all([
+    if (!open || navigationLoaded) return;
+    Promise.allSettled([
       fetch("/api/categories").then((res) => res.json()),
       fetch("/api/special-edition").then((res) => res.json()),
     ])
-      .then(([categoryData, specialData]) => {
-        setCategories(categoryData.categories ?? []);
-        setSpecialEditions(specialData.pages ?? []);
-      })
-      .catch(() => { setCategories([]); setSpecialEditions([]); });
-  }, [open, categories.length]);
+      .then(([categoryResult, specialResult]) => {
+        if (categoryResult.status === "fulfilled") setCategories(categoryResult.value.categories ?? []);
+        if (specialResult.status === "fulfilled") setSpecialEditions(specialResult.value.pages ?? []);
+        setNavigationLoaded(true);
+      });
+  }, [open, navigationLoaded]);
 
   useEffect(() => {
     if (!open) return;
