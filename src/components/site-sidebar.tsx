@@ -6,10 +6,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 type CategoryItem = { id: string; name: string; slug: string };
+type SpecialEditionItem = { id: string; title: string; slug: string };
 
 export function SiteSidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
   const pathname = usePathname();
   const [categories, setCategories] = useState<CategoryItem[]>([]);
+  const [specialEditions, setSpecialEditions] = useState<SpecialEditionItem[]>([]);
+  const [specialOpen, setSpecialOpen] = useState(pathname.startsWith("/special-edition"));
   const [query, setQuery] = useState("");
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const asideRef = useRef<HTMLElement>(null);
@@ -17,10 +20,15 @@ export function SiteSidebar({ open, onClose }: { open: boolean; onClose: () => v
 
   useEffect(() => {
     if (!open || categories.length > 0) return;
-    fetch("/api/categories")
-      .then((res) => res.json())
-      .then((data) => setCategories(data.categories ?? []))
-      .catch(() => setCategories([]));
+    Promise.all([
+      fetch("/api/categories").then((res) => res.json()),
+      fetch("/api/special-edition").then((res) => res.json()),
+    ])
+      .then(([categoryData, specialData]) => {
+        setCategories(categoryData.categories ?? []);
+        setSpecialEditions(specialData.pages ?? []);
+      })
+      .catch(() => { setCategories([]); setSpecialEditions([]); });
   }, [open, categories.length]);
 
   useEffect(() => {
@@ -154,20 +162,21 @@ export function SiteSidebar({ open, onClose }: { open: boolean; onClose: () => v
             Favorit
           </Link>
 
-          <Link
-            href="/special-edition"
-            aria-current={pathname === "/special-edition" ? "page" : undefined}
-            className={`mt-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 ${
-              pathname === "/special-edition"
-                ? "bg-neutral-900 text-white"
-                : "text-neutral-700 hover:bg-blue-100"
-            }`}
-          >
-            <svg className="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 3l1.7 5.3L19 10l-5.3 1.7L12 17l-1.7-5.3L5 10l5.3-1.7L12 3z" />
-            </svg>
-            Special Edition
-          </Link>
+          <div className="mt-1">
+            <div className={`flex items-center rounded-xl transition-colors ${pathname.startsWith("/special-edition") ? "bg-neutral-900 text-white" : "text-neutral-700 hover:bg-blue-100"}`}>
+              <Link href="/special-edition" aria-current={pathname === "/special-edition" ? "page" : undefined} className="flex min-w-0 flex-1 items-center gap-3 rounded-l-xl px-3 py-2.5 text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                <svg className="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 3l1.7 5.3L19 10l-5.3 1.7L12 17l-1.7-5.3L5 10l5.3-1.7L12 3z" /></svg>
+                <span className="truncate">Special Edition</span>
+              </Link>
+              <button type="button" onClick={() => setSpecialOpen((value) => !value)} aria-label={`${specialOpen ? "Tutup" : "Buka"} submenu Special Edition`} aria-expanded={specialOpen} aria-controls="special-edition-submenu" className="mr-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                <svg className={`h-4 w-4 transition-transform ${specialOpen ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 9l6 6 6-6" /></svg>
+              </button>
+            </div>
+            {specialOpen ? <ul id="special-edition-submenu" className="ml-5 mt-1 space-y-0.5 border-l border-blue-200 pl-3">
+              {specialEditions.map((page) => { const href = `/special-edition/${page.slug}`; const active = pathname === href; return <li key={page.id}><Link href={href} aria-current={active ? "page" : undefined} className={`block rounded-lg px-3 py-2 text-xs transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 ${active ? "bg-blue-200/80 font-semibold text-neutral-900" : "text-neutral-600 hover:bg-blue-100 hover:text-neutral-900"}`}>{page.title}</Link></li>; })}
+              {specialEditions.length === 0 ? <li className="px-3 py-2 text-xs text-neutral-400">Belum ada halaman.</li> : null}
+            </ul> : null}
+          </div>
 
           <Link
             href="/testimoni"

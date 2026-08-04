@@ -4,6 +4,15 @@ import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/require-admin";
 import { specialEditionSchema } from "@/lib/validation";
 
+export async function GET() {
+  const pages = await prisma.specialEditionPage.findMany({
+    where: { published: true },
+    orderBy: { updatedAt: "desc" },
+    select: { id: true, slug: true, title: true },
+  });
+  return NextResponse.json({ pages });
+}
+
 export async function POST(request: NextRequest) {
   const { response } = await requireAdmin();
   if (response) return response;
