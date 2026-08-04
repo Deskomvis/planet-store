@@ -59,6 +59,15 @@ export default async function AdminDashboardPage() {
 
       <BannerManagement initialBanners={banners} />
 
+      <div className="flex flex-col gap-4 rounded-lg border border-neutral-200 bg-neutral-950 p-5 text-white sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-200">Premium catalogue</p>
+          <h2 className="mt-2 text-lg font-bold">Halaman Special Edition</h2>
+          <p className="mt-1 text-sm text-neutral-400">Kelola hero, cerita, sorotan produk, keunggulan, dan CTA.</p>
+        </div>
+        <Link href="/admin/special-edition" className="shrink-0 rounded-full bg-white px-4 py-2 text-center text-sm font-semibold text-neutral-900 hover:bg-neutral-200">Edit halaman</Link>
+      </div>
+
       <div className="flex items-center justify-between rounded-lg border border-neutral-200 bg-white p-4">
         <div>
           <h2 className="text-lg font-bold text-neutral-900">Testimoni</h2>

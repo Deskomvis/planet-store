@@ -13,15 +13,15 @@ export default async function AdminProtectedLayout({
   return (
     <>
       <header className="border-b border-neutral-200 bg-white">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
-          <div className="flex items-center gap-6">
+        <div className="mx-auto flex max-w-5xl flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:gap-6">
             <Link href="/admin" className="flex items-center gap-2.5 text-lg font-bold text-neutral-900">
               <span className="flex shrink-0 items-center">
                 <Image src="/logo-gp-black.webp" alt="Gudang Planet" width={130} height={39} />
               </span>
               Admin Gudang Planet
             </Link>
-            <nav className="flex items-center gap-4">
+            <nav className="flex max-w-full items-center gap-4 overflow-x-auto pb-1 sm:pb-0">
               <Link href="/admin" className="text-sm font-medium text-neutral-600 hover:text-neutral-900">
                 Ringkasan
               </Link>
@@ -34,6 +34,12 @@ export default async function AdminProtectedLayout({
                     Testimoni
                   </Link>
                   <Link
+                    href="/admin/special-edition"
+                    className="text-sm font-medium text-neutral-600 hover:text-neutral-900"
+                  >
+                    Special Edition
+                  </Link>
+                  <Link
                     href="/admin/pengaturan"
                     className="text-sm font-medium text-neutral-600 hover:text-neutral-900"
                   >
@@ -43,7 +49,7 @@ export default async function AdminProtectedLayout({
               ) : null}
             </nav>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center justify-between gap-4 sm:justify-end">
             {session ? (
               <span className="text-sm text-neutral-500">{session.name}</span>
             ) : null}

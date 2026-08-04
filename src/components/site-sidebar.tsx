@@ -155,6 +155,21 @@ export function SiteSidebar({ open, onClose }: { open: boolean; onClose: () => v
           </Link>
 
           <Link
+            href="/special-edition"
+            aria-current={pathname === "/special-edition" ? "page" : undefined}
+            className={`mt-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 ${
+              pathname === "/special-edition"
+                ? "bg-neutral-900 text-white"
+                : "text-neutral-700 hover:bg-blue-100"
+            }`}
+          >
+            <svg className="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 3l1.7 5.3L19 10l-5.3 1.7L12 17l-1.7-5.3L5 10l5.3-1.7L12 3z" />
+            </svg>
+            Special Edition
+          </Link>
+
+          <Link
             href="/testimoni"
             aria-current={pathname === "/testimoni" ? "page" : undefined}
             className={`mt-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 ${

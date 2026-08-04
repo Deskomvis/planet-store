@@ -82,3 +82,15 @@ model StoreSettings {
   googleMapsEmbed  String?
   updatedAt        DateTime @updatedAt
 }
+
+// Singleton row (id = "special-edition") for the editable premium landing page.
+model SpecialEditionPage {
+  id          String   @id @default("special-edition")
+  title       String
+  eyebrow     String?
+  description String?
+  heroImageUrl String?
+  published   Boolean  @default(false)
+  contentJson String   @default("[]")
+  updatedAt   DateTime @updatedAt
+}
