@@ -23,7 +23,12 @@ export const testimonialSchema = z.object({
 
 export const bannerSchema = z.object({
   imageUrl: z.string().url("Gambar wajib diunggah"),
-  link: z.union([z.string().url("URL tautan tidak valid"), z.literal(""), z.null()]).optional(),
+  link: z.union([
+    z.string().url("URL tautan tidak valid"),
+    z.string().regex(/^\/(?!\/)/, "Link internal harus diawali satu karakter /"),
+    z.literal(""),
+    z.null(),
+  ]).optional(),
 });
 
 export const loginSchema = z.object({

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, type ChangeEvent } from "react";
+import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { DeleteButton } from "@/components/admin/delete-button";
@@ -23,6 +23,14 @@ function BannerLinkDialog({
   const [link, setLink] = useState(banner.link ?? "");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [specialPages, setSpecialPages] = useState<Array<{ slug: string; title: string }>>([]);
+
+  useEffect(() => {
+    fetch("/api/special-edition")
+      .then((response) => response.json())
+      .then((data) => setSpecialPages(data.pages ?? []))
+      .catch(() => setSpecialPages([]));
+  }, []);
 
   async function handleSave() {
     setError(null);
@@ -54,25 +62,33 @@ function BannerLinkDialog({
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
       onClick={onClose}
     >
-      <div className="w-full max-w-sm rounded-lg bg-white p-5 shadow-xl" onClick={(e) => e.stopPropagation()}>
+      <div className="w-full max-w-md rounded-lg bg-white p-5 shadow-xl" onClick={(e) => e.stopPropagation()}>
         <h2 className="text-base font-bold text-neutral-900">Tautan Banner</h2>
         <div className="relative mt-3 aspect-[16/6] w-full overflow-hidden rounded-lg bg-neutral-100">
           <Image src={banner.imageUrl} alt="Banner" fill className="object-cover" />
         </div>
         <div className="mt-4">
+          <label htmlFor="banner-link-preset" className="block text-sm font-medium text-neutral-700">Pilih halaman tujuan</label>
+          <select id="banner-link-preset" value="" onChange={(event) => { if (event.target.value) setLink(event.target.value); }} className="mt-1 w-full rounded border border-neutral-300 bg-white px-3 py-2 text-sm focus:border-neutral-500 focus:outline-none">
+            <option value="">Pilih cepat (opsional)</option>
+            <option value="/">Katalog utama</option>
+            <option value="/special-edition">Semua Special Edition</option>
+            {specialPages.map((page) => <option key={page.slug} value={`/special-edition/${page.slug}`}>Special Edition — {page.title}</option>)}
+          </select>
+
           <label htmlFor="banner-link" className="block text-sm font-medium text-neutral-700">
-            URL Tujuan (opsional)
+            URL tujuan custom (opsional)
           </label>
           <input
             id="banner-link"
-            type="url"
+            type="text"
             value={link}
             onChange={(e) => setLink(e.target.value)}
-            placeholder="https://..."
+            placeholder="/special-edition/original atau https://..."
             className="mt-1 w-full rounded border border-neutral-300 px-3 py-2 text-sm focus:border-neutral-500 focus:outline-none"
           />
           <p className="mt-1 text-xs text-neutral-500">
-            Kosongkan jika banner ini tidak perlu bisa diklik.
+            Link internal diawali <code>/</code>. Kosongkan jika banner tidak perlu bisa diklik.
           </p>
         </div>
 
@@ -154,7 +170,7 @@ export function BannerManagement({ initialBanners }: { initialBanners: ManagedBa
         <div>
           <h2 className="text-lg font-bold text-neutral-900">Banner Katalog</h2>
           <p className="mt-1 text-sm text-neutral-500">
-            Tampil sebagai slider di bagian atas halaman katalog. Gunakan gambar landscape
+            Tampil sebagai slider di bagian atas halaman katalog. Setiap banner dapat diberi link opsional ke Special Edition, kategori, atau URL lain. Gunakan gambar landscape
             dengan rasio 16:6 (mis. 1600 x 600px) agar tidak terpotong, dan posisikan objek
             penting di tengah karena tepi kiri-kanan bisa sedikit terpotong di layar mobile.
           </p>
@@ -217,6 +233,11 @@ export function BannerManagement({ initialBanners }: { initialBanners: ManagedBa
                   </div>
                 </div>
               </button>
+
+              <div className="flex items-center justify-between gap-2 border-t border-neutral-200 px-3 py-2">
+                <span className={`min-w-0 truncate text-[10px] font-semibold ${banner.link ? "text-green-700" : "text-neutral-400"}`} title={banner.link ?? undefined}>{banner.link ? banner.link : "Tanpa link"}</span>
+                <button type="button" onClick={() => setEditing(banner)} className="shrink-0 rounded-full bg-neutral-900 px-2.5 py-1 text-[10px] font-semibold text-white hover:bg-neutral-700">Atur Link</button>
+              </div>
 
               <DeleteButton
                 url={`/api/banners/${banner.id}`}

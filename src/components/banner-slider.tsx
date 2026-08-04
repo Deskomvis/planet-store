@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 export type SliderBanner = {
   id: string;
@@ -128,7 +129,11 @@ export function BannerSlider({ banners }: { banners: SliderBanner[] }) {
                 transition: "opacity 700ms ease",
               }}
             >
-              {banner.link ? (
+              {banner.link?.startsWith("/") && !banner.link.startsWith("//") ? (
+                <Link href={banner.link} className="block cursor-pointer" aria-label="Buka halaman banner">
+                  {content}
+                </Link>
+              ) : banner.link ? (
                 <a href={banner.link} target="_blank" rel="noopener noreferrer" className="block cursor-pointer">
                   {content}
                 </a>
