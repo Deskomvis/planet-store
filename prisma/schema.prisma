@@ -86,6 +86,7 @@ model StoreSettings {
 // Singleton row (id = "special-edition") for the editable premium landing page.
 model SpecialEditionPage {
   id          String   @id @default("special-edition")
+  slug        String   @unique
   title       String
   eyebrow     String?
   description String?

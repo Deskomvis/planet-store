@@ -10,6 +10,7 @@ const blockNames: Record<SpecialEditionBlock["type"], string> = {
   editorial: "Cerita editorial",
   product: "Sorotan produk",
   features: "Daftar keunggulan",
+  variants: "Katalog varian",
   cta: "Ajakan / CTA",
 };
 
@@ -25,13 +26,14 @@ function makeBlock(type: SpecialEditionBlock["type"]): SpecialEditionBlock {
     linkLabel: type === "cta" || type === "product" ? "Lihat koleksi" : "",
     linkUrl: "",
     items: type === "features" ? ["Material pilihan", "Jumlah terbatas", "Detail eksklusif"] : [],
+    variants: type === "variants" ? [{ id: `variant-${Date.now()}`, name: "Varian 01", description: "", imageUrl: "" }] : [],
     align: "left",
   };
 }
 
 const inputClass = "mt-1 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm text-neutral-900 focus:border-neutral-600 focus:outline-none";
 
-export function SpecialEditionEditor({ initialValue }: { initialValue: SpecialEditionInput }) {
+export function SpecialEditionEditor({ initialValue, pageId }: { initialValue: SpecialEditionInput; pageId?: string }) {
   const router = useRouter();
   const [value, setValue] = useState(initialValue);
   const [saving, setSaving] = useState(false);
@@ -60,15 +62,16 @@ export function SpecialEditionEditor({ initialValue }: { initialValue: SpecialEd
     setError(null);
     setMessage(null);
     try {
-      const response = await fetch("/api/special-edition", {
-        method: "PUT",
+      const response = await fetch(pageId ? `/api/special-edition/${pageId}` : "/api/special-edition", {
+        method: pageId ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(value),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error ?? "Gagal menyimpan halaman");
       setMessage("Halaman Special Edition berhasil disimpan.");
-      router.refresh();
+      if (!pageId) router.replace(`/admin/special-edition/${data.page.id}`);
+      else router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Terjadi kesalahan jaringan");
     } finally {
@@ -85,7 +88,7 @@ export function SpecialEditionEditor({ initialValue }: { initialValue: SpecialEd
             <p className="mt-1 text-sm text-neutral-500">Atur halaman editorial premium dan susunan bloknya.</p>
           </div>
           <div className="flex gap-2">
-            <Link href="/special-edition" target="_blank" className="rounded-full border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50">
+            <Link href={`/special-edition/${value.slug}`} target="_blank" className="rounded-full border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50">
               Lihat halaman
             </Link>
             <button type="button" onClick={save} disabled={saving} className="rounded-full bg-neutral-900 px-5 py-2 text-sm font-semibold text-white hover:bg-neutral-700 disabled:opacity-50">
@@ -97,6 +100,9 @@ export function SpecialEditionEditor({ initialValue }: { initialValue: SpecialEd
         {error ? <p className="mt-3 text-sm text-red-600">{error}</p> : null}
 
         <div className="mt-6 grid gap-5 md:grid-cols-2">
+          <label className="text-sm font-medium text-neutral-700">Slug URL
+            <div className="mt-1 flex items-center rounded-lg border border-neutral-300 bg-white px-3"><span className="shrink-0 text-xs text-neutral-400">/special-edition/</span><input value={value.slug} onChange={(e) => setValue({ ...value, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-").replace(/-+/g, "-") })} className="min-w-0 flex-1 py-2 text-sm focus:outline-none" /></div>
+          </label>
           <label className="text-sm font-medium text-neutral-700">Label kecil
             <input value={value.eyebrow} onChange={(e) => setValue({ ...value, eyebrow: e.target.value })} className={inputClass} placeholder="LIMITED RELEASE / 2026" />
           </label>
@@ -144,6 +150,17 @@ export function SpecialEditionEditor({ initialValue }: { initialValue: SpecialEd
                 <label className="text-sm font-medium text-neutral-700 md:col-span-2">Deskripsi<textarea value={block.body} onChange={(e) => updateBlock(index, { body: e.target.value })} className={`${inputClass} min-h-20`} /></label>
                 {(block.type === "editorial" || block.type === "product") ? <div className="md:col-span-2"><ImageInput id={`block-image-${block.id}`} label="Gambar blok" value={block.imageUrl} onChange={(imageUrl) => updateBlock(index, { imageUrl })} /></div> : null}
                 {block.type === "features" ? <label className="text-sm font-medium text-neutral-700 md:col-span-2">Keunggulan (satu per baris)<textarea value={block.items.join("\n")} onChange={(e) => updateBlock(index, { items: e.target.value.split("\n").slice(0, 8) })} className={`${inputClass} min-h-28`} /></label> : null}
+                {block.type === "variants" ? <div className="space-y-3 md:col-span-2">
+                  <div className="flex items-center justify-between"><p className="text-sm font-semibold text-neutral-800">Daftar varian</p><button type="button" onClick={() => updateBlock(index, { variants: [...block.variants, { id: `variant-${Date.now()}`, name: `Varian ${String(block.variants.length + 1).padStart(2, "0")}`, description: "", imageUrl: "" }] })} className="rounded-full bg-neutral-900 px-3 py-1.5 text-xs font-medium text-white">+ Tambah varian</button></div>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {block.variants.map((variant, variantIndex) => <div key={variant.id} className="rounded-lg border border-neutral-200 p-3">
+                      <div className="flex justify-between gap-2"><p className="text-xs font-bold text-neutral-500">VARIAN {variantIndex + 1}</p><button type="button" onClick={() => updateBlock(index, { variants: block.variants.filter((item) => item.id !== variant.id) })} className="text-xs text-red-600">Hapus</button></div>
+                      <label className="mt-2 block text-xs font-medium text-neutral-700">Nama<input value={variant.name} onChange={(e) => updateBlock(index, { variants: block.variants.map((item) => item.id === variant.id ? { ...item, name: e.target.value } : item) })} className={inputClass} /></label>
+                      <label className="mt-2 block text-xs font-medium text-neutral-700">Deskripsi<input value={variant.description} onChange={(e) => updateBlock(index, { variants: block.variants.map((item) => item.id === variant.id ? { ...item, description: e.target.value } : item) })} className={inputClass} /></label>
+                      <div className="mt-3"><ImageInput id={`variant-${block.id}-${variant.id}`} label="Gambar varian" value={variant.imageUrl} onChange={(imageUrl) => updateBlock(index, { variants: block.variants.map((item) => item.id === variant.id ? { ...item, imageUrl } : item) })} /></div>
+                    </div>)}
+                  </div>
+                </div> : null}
                 {(block.type === "product" || block.type === "cta") ? <><label className="text-sm font-medium text-neutral-700">Teks tombol<input value={block.linkLabel} onChange={(e) => updateBlock(index, { linkLabel: e.target.value })} className={inputClass} /></label><label className="text-sm font-medium text-neutral-700">Tautan<input value={block.linkUrl} onChange={(e) => updateBlock(index, { linkUrl: e.target.value })} className={inputClass} placeholder="/kategori/... atau https://..." /></label></> : null}
                 {(block.type === "editorial" || block.type === "product") ? <label className="text-sm font-medium text-neutral-700">Posisi gambar<select value={block.align} onChange={(e) => updateBlock(index, { align: e.target.value as "left" | "right" })} className={inputClass}><option value="left">Kiri</option><option value="right">Kanan</option></select></label> : null}
                 <label className="flex items-center gap-2 text-sm font-medium text-neutral-700"><input type="checkbox" checked={block.enabled} onChange={(e) => updateBlock(index, { enabled: e.target.checked })} /> Tampilkan blok</label>

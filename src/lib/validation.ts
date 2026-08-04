@@ -37,7 +37,7 @@ export const settingsSchema = z.object({
 
 const specialEditionBlockSchema = z.object({
   id: z.string().min(1).max(100),
-  type: z.enum(["editorial", "product", "features", "cta"]),
+  type: z.enum(["editorial", "product", "features", "variants", "cta"]),
   enabled: z.boolean(),
   eyebrow: z.string().trim().max(100).optional().default(""),
   title: z.string().trim().max(180).optional().default(""),
@@ -46,10 +46,17 @@ const specialEditionBlockSchema = z.object({
   linkLabel: z.string().trim().max(80).optional().default(""),
   linkUrl: z.union([z.string().url("URL tautan tidak valid"), z.string().startsWith("/"), z.literal("")]).optional().default(""),
   items: z.array(z.string().trim().max(120)).max(8).optional().default([]),
+  variants: z.array(z.object({
+    id: z.string().min(1).max(100),
+    name: z.string().trim().max(120),
+    description: z.string().trim().max(300).optional().default(""),
+    imageUrl: z.union([z.string().url("URL gambar varian tidak valid"), z.literal("")]).optional().default(""),
+  })).max(24).optional().default([]),
   align: z.enum(["left", "right"]).optional().default("left"),
 });
 
 export const specialEditionSchema = z.object({
+  slug: z.string().trim().min(2, "Slug minimal 2 karakter").max(120).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Slug hanya boleh berisi huruf kecil, angka, dan tanda hubung"),
   title: z.string().trim().min(2, "Judul minimal 2 karakter").max(180),
   eyebrow: z.string().trim().max(100).optional().default(""),
   description: z.string().trim().max(1000).optional().default(""),

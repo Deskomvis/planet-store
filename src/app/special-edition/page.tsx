@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
+import type { SpecialEditionPage as SpecialEditionPageData } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { SiteFooter } from "@/components/site-footer";
 import type { SpecialEditionBlock } from "@/lib/validation";
@@ -36,10 +36,7 @@ function EditorialBlock({ block, index }: { block: SpecialEditionBlock; index: n
   );
 }
 
-export default async function SpecialEditionPage() {
-  const page = await prisma.specialEditionPage.findUnique({ where: { id: "special-edition" } });
-  if (!page?.published) notFound();
-
+export function SpecialEditionView({ page }: { page: SpecialEditionPageData }) {
   let blocks: SpecialEditionBlock[] = [];
   try { blocks = JSON.parse(page.contentJson); } catch { blocks = []; }
   blocks = blocks.filter((block) => block.enabled);
@@ -49,34 +46,27 @@ export default async function SpecialEditionPage() {
       <header className="absolute inset-x-0 top-0 z-40">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-5 sm:px-8 lg:px-12">
           <Link href="/" className="text-sm font-black uppercase tracking-[0.18em] text-white sm:text-base">Gudang Planet</Link>
-          <div className="flex items-center gap-5"><span className="hidden text-[10px] uppercase tracking-[0.28em] text-white/55 sm:inline">Curated / Limited / Distinctive</span><Link href="/" className="rounded-full border border-white/30 px-4 py-2 text-[10px] font-bold uppercase tracking-[0.2em] text-white transition hover:bg-white hover:text-black">Katalog</Link></div>
+          <div className="flex items-center gap-5"><Link href="/special-edition" className="hidden text-[10px] uppercase tracking-[0.28em] text-white/55 sm:inline">All Special Editions</Link><Link href="/" className="rounded-full border border-white/30 px-4 py-2 text-[10px] font-bold uppercase tracking-[0.2em] text-white transition hover:bg-white hover:text-black">Katalog</Link></div>
         </div>
       </header>
-
       <main>
         <section className="relative flex min-h-[92svh] items-end overflow-hidden bg-neutral-950">
           {page.heroImageUrl ? <Image src={page.heroImageUrl} alt={page.title} fill priority fetchPriority="high" sizes="100vw" className="object-cover" /> : <div className="absolute inset-0 bg-[radial-gradient(circle_at_72%_30%,#4a4438_0%,#1b1a18_28%,#080808_70%)]" />}
           <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-black/90" />
-          <div className="absolute inset-y-0 left-[8%] hidden w-px bg-white/10 lg:block" />
-          <div className="relative mx-auto w-full max-w-7xl px-5 pb-12 sm:px-8 sm:pb-16 lg:px-12 lg:pb-20">
-            <div className="max-w-5xl">
-              {page.eyebrow ? <p className="mb-5 text-[10px] font-bold uppercase tracking-[0.42em] text-amber-100/80 sm:text-xs">{page.eyebrow}</p> : null}
-              <h1 className="font-serif text-[clamp(4rem,14vw,11rem)] leading-[0.76] tracking-[-0.055em] text-white">{page.title}</h1>
-              <div className="mt-8 flex flex-col gap-6 border-t border-white/20 pt-5 sm:flex-row sm:items-start sm:justify-between">
-                {page.description ? <p className="max-w-xl text-sm leading-6 text-white/65 sm:text-base">{page.description}</p> : <span />}
-                <p className="shrink-0 text-[10px] uppercase leading-5 tracking-[0.25em] text-white/45">Exclusive catalogue<br />Scroll to discover ↓</p>
-              </div>
-            </div>
-          </div>
+          <div className="relative mx-auto w-full max-w-7xl px-5 pb-12 sm:px-8 sm:pb-16 lg:px-12 lg:pb-20"><div className="max-w-5xl">{page.eyebrow ? <p className="mb-5 text-[10px] font-bold uppercase tracking-[0.42em] text-amber-100/80 sm:text-xs">{page.eyebrow}</p> : null}<h1 className="font-serif text-[clamp(4rem,14vw,11rem)] leading-[0.76] tracking-[-0.055em] text-white">{page.title}</h1><div className="mt-8 flex flex-col gap-6 border-t border-white/20 pt-5 sm:flex-row sm:items-start sm:justify-between">{page.description ? <p className="max-w-xl text-sm leading-6 text-white/65 sm:text-base">{page.description}</p> : <span />}<p className="shrink-0 text-[10px] uppercase leading-5 tracking-[0.25em] text-white/45">Exclusive catalogue<br />Scroll to discover ↓</p></div></div></div>
         </section>
-
         {blocks.map((block, index) => {
           if (block.type === "editorial" || block.type === "product") return <EditorialBlock key={block.id} block={block} index={index} />;
           if (block.type === "features") return <section key={block.id} className="border-y border-white/10 bg-[#0e0e0e]"><div className="mx-auto max-w-7xl px-5 py-16 sm:px-8 md:py-24 lg:px-12"><div className="grid gap-12 md:grid-cols-2"><div>{block.eyebrow ? <p className="text-[10px] font-bold uppercase tracking-[0.35em] text-amber-200/70">{block.eyebrow}</p> : null}<h2 className="mt-5 max-w-xl font-serif text-4xl leading-none text-stone-100 sm:text-5xl">{block.title}</h2>{block.body ? <p className="mt-6 max-w-md text-sm leading-7 text-stone-400">{block.body}</p> : null}</div><ol className="divide-y divide-white/10 border-t border-white/10">{block.items.filter(Boolean).map((item, itemIndex) => <li key={`${block.id}-${itemIndex}`} className="flex items-center gap-6 py-5"><span className="text-[10px] tracking-widest text-amber-200/50">0{itemIndex + 1}</span><span className="text-sm uppercase tracking-[0.16em] text-stone-200">{item}</span></li>)}</ol></div></div></section>;
+          if (block.type === "variants") return <section key={block.id} className="mx-auto max-w-7xl px-5 py-16 sm:px-8 md:py-24 lg:px-12"><div className="max-w-2xl">{block.eyebrow ? <p className="text-[10px] font-bold uppercase tracking-[0.35em] text-amber-200/70">{block.eyebrow}</p> : null}<h2 className="mt-5 font-serif text-4xl leading-none text-white sm:text-6xl">{block.title}</h2>{block.body ? <p className="mt-5 text-sm leading-7 text-stone-400">{block.body}</p> : null}</div><div className="mt-10 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3">{block.variants.map((variant, variantIndex) => <article key={variant.id} className="group"><div className="relative aspect-[4/5] overflow-hidden bg-neutral-900">{variant.imageUrl ? <Image src={variant.imageUrl} alt={variant.name} fill sizes="(max-width:640px) 50vw, 33vw" className="object-cover transition-transform duration-500 group-hover:scale-[1.03]" /> : <div className="absolute inset-0 bg-[radial-gradient(circle_at_60%_25%,#3b372f,#111_65%)]" />}<span className="absolute left-3 top-3 text-[9px] tracking-[0.25em] text-white/50">{String(variantIndex + 1).padStart(2,"0")}</span></div><h3 className="mt-3 text-xs font-bold uppercase tracking-[0.16em] text-stone-100 sm:text-sm">{variant.name}</h3>{variant.description ? <p className="mt-1 text-xs leading-5 text-stone-500">{variant.description}</p> : null}</article>)}</div></section>;
           return <section key={block.id} className="relative overflow-hidden px-5 py-24 text-center sm:px-8 md:py-36"><div className="absolute inset-0 bg-[radial-gradient(circle_at_center,#27241f_0%,#090909_62%)]" /><div className="relative mx-auto max-w-4xl">{block.eyebrow ? <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-amber-200/70">{block.eyebrow}</p> : null}<h2 className="mt-6 font-serif text-5xl leading-[0.92] text-white sm:text-7xl">{block.title}</h2>{block.body ? <p className="mx-auto mt-6 max-w-xl text-sm leading-7 text-stone-400">{block.body}</p> : null}<ActionLink href={block.linkUrl} label={block.linkLabel} /></div></section>;
         })}
-      </main>
-      <div className="border-t border-white/10 [&_footer]:border-white/10 [&_footer]:bg-black [&_footer]:text-stone-400"><SiteFooter /></div>
+      </main><div className="border-t border-white/10 [&_footer]:border-white/10 [&_footer]:bg-black [&_footer]:text-stone-400"><SiteFooter /></div>
     </div>
   );
+}
+
+export default async function SpecialEditionPage() {
+  const pages = await prisma.specialEditionPage.findMany({ where: { published: true }, orderBy: { updatedAt: "desc" } });
+  return <div className="min-h-screen bg-[#090909] text-white"><header className="border-b border-white/10"><div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-5 sm:px-8 lg:px-12"><Link href="/" className="text-sm font-black uppercase tracking-[0.18em]">Gudang Planet</Link><Link href="/" className="rounded-full border border-white/30 px-4 py-2 text-[10px] font-bold uppercase tracking-[0.2em]">Katalog</Link></div></header><main className="mx-auto max-w-7xl px-5 py-16 sm:px-8 md:py-24 lg:px-12"><p className="text-[10px] font-bold uppercase tracking-[0.4em] text-amber-200/70">Curated releases</p><h1 className="mt-5 font-serif text-5xl leading-none sm:text-7xl">Special Editions</h1><p className="mt-6 max-w-xl text-sm leading-7 text-stone-400">Koleksi khusus dengan karakter, cerita, dan detail yang dirilis dalam jumlah terbatas.</p>{pages.length === 0 ? <p className="mt-16 text-sm text-stone-500">Belum ada koleksi yang dipublikasikan.</p> : <div className="mt-14 grid gap-5 sm:grid-cols-2">{pages.map((page) => <Link key={page.id} href={`/special-edition/${page.slug}`} className="group"><div className="relative aspect-[4/3] overflow-hidden bg-neutral-900">{page.heroImageUrl ? <Image src={page.heroImageUrl} alt={page.title} fill sizes="(max-width:640px) 100vw, 50vw" className="object-cover transition-transform duration-700 group-hover:scale-[1.03]" /> : <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_20%,#4a4438,#111_65%)]" />}</div><p className="mt-4 text-[9px] uppercase tracking-[0.3em] text-amber-200/60">{page.eyebrow || "Special Edition"}</p><h2 className="mt-2 font-serif text-3xl text-white sm:text-4xl">{page.title}</h2>{page.description ? <p className="mt-2 line-clamp-2 text-sm leading-6 text-stone-500">{page.description}</p> : null}</Link>)}</div>}</main><div className="border-t border-white/10 [&_footer]:border-white/10 [&_footer]:bg-black [&_footer]:text-stone-400"><SiteFooter /></div></div>;
 }

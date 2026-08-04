@@ -4,7 +4,7 @@ import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/require-admin";
 import { specialEditionSchema } from "@/lib/validation";
 
-export async function PUT(request: NextRequest) {
+export async function POST(request: NextRequest) {
   const { response } = await requireAdmin();
   if (response) return response;
 
@@ -16,27 +16,18 @@ export async function PUT(request: NextRequest) {
     );
   }
 
+  const existing = await prisma.specialEditionPage.findUnique({ where: { slug: parsed.data.slug } });
+  if (existing) return NextResponse.json({ error: "Slug sudah digunakan halaman lain" }, { status: 409 });
+
   const { blocks, ...page } = parsed.data;
-  const saved = await prisma.specialEditionPage.upsert({
-    where: { id: "special-edition" },
-    update: {
-      ...page,
-      eyebrow: page.eyebrow || null,
-      description: page.description || null,
-      heroImageUrl: page.heroImageUrl || null,
-      contentJson: JSON.stringify(blocks),
-    },
-    create: {
-      id: "special-edition",
-      ...page,
-      eyebrow: page.eyebrow || null,
-      description: page.description || null,
-      heroImageUrl: page.heroImageUrl || null,
-      contentJson: JSON.stringify(blocks),
-    },
-  });
+  const saved = await prisma.specialEditionPage.create({ data: {
+    ...page,
+    eyebrow: page.eyebrow || null,
+    description: page.description || null,
+    heroImageUrl: page.heroImageUrl || null,
+    contentJson: JSON.stringify(blocks),
+  }});
 
   revalidatePath("/special-edition");
-  revalidatePath("/admin/special-edition");
   return NextResponse.json({ page: saved });
 }
