@@ -16,6 +16,14 @@ export default async function AdminDashboardPage() {
           <p className="mt-1 text-sm text-neutral-500">Kelola kategori dan produk katalog Gudang Planet.</p>
         </div>
         <CategoryManagement />
+        <div className="flex flex-col gap-4 rounded-lg border border-neutral-200 bg-neutral-950 p-5 text-white sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-200">Premium catalogue</p>
+            <h2 className="mt-2 text-lg font-bold">Halaman Special Edition</h2>
+            <p className="mt-1 text-sm text-neutral-400">Kelola hero, cerita, produk pilihan, keunggulan, dan CTA.</p>
+          </div>
+          <Link href="/admin/special-edition" className="shrink-0 rounded-full bg-white px-4 py-2 text-center text-sm font-semibold text-neutral-900 hover:bg-neutral-200">Edit halaman</Link>
+        </div>
       </div>
     );
   }

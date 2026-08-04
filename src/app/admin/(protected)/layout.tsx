@@ -34,12 +34,6 @@ export default async function AdminProtectedLayout({
                     Testimoni
                   </Link>
                   <Link
-                    href="/admin/special-edition"
-                    className="text-sm font-medium text-neutral-600 hover:text-neutral-900"
-                  >
-                    Special Edition
-                  </Link>
-                  <Link
                     href="/admin/pengaturan"
                     className="text-sm font-medium text-neutral-600 hover:text-neutral-900"
                   >
@@ -47,6 +41,12 @@ export default async function AdminProtectedLayout({
                   </Link>
                 </>
               ) : null}
+              <Link
+                href="/admin/special-edition"
+                className="shrink-0 text-sm font-medium text-neutral-600 hover:text-neutral-900"
+              >
+                Special Edition
+              </Link>
             </nav>
           </div>
           <div className="flex items-center justify-between gap-4 sm:justify-end">

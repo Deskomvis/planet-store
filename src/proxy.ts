@@ -3,7 +3,7 @@ import { jwtVerify } from "jose";
 
 const COOKIE_NAME = "admin_session";
 
-// Routes the restricted "input" role (category/product CRUD only) may not
+// Routes the restricted "input" role (catalog and Special Edition only) may not
 // visit, even with a valid session — kept in sync with the API-level
 // requireAdmin({ role: "admin" }) checks on banners/testimonials/settings.
 const ADMIN_ONLY_PATHS = ["/admin/testimoni", "/admin/pengaturan"];

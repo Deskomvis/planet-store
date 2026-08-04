@@ -1,6 +1,4 @@
-import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
-import { getSession } from "@/lib/session";
 import { SpecialEditionEditor } from "@/components/admin/special-edition-editor";
 import { specialEditionSchema, type SpecialEditionBlock } from "@/lib/validation";
 
@@ -11,9 +9,6 @@ const starterBlocks: SpecialEditionBlock[] = [
 ];
 
 export default async function SpecialEditionAdminPage() {
-  const session = await getSession();
-  if (session?.role !== "admin") notFound();
-
   const page = await prisma.specialEditionPage.findUnique({ where: { id: "special-edition" } });
   let blocks: SpecialEditionBlock[] = starterBlocks;
   if (page?.contentJson) {

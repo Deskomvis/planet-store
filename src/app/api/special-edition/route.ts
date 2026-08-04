@@ -5,7 +5,7 @@ import { requireAdmin } from "@/lib/require-admin";
 import { specialEditionSchema } from "@/lib/validation";
 
 export async function PUT(request: NextRequest) {
-  const { response } = await requireAdmin({ role: "admin" });
+  const { response } = await requireAdmin();
   if (response) return response;
 
   const parsed = specialEditionSchema.safeParse(await request.json().catch(() => null));

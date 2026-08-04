@@ -4,7 +4,7 @@ import { getSession } from "@/lib/session";
 
 /**
  * Pass `{ role: "admin" }` to restrict a route to full admins only — the
- * "input" role is limited to category/product CRUD and gets a 403
+ * "input" role is limited to catalog and Special Edition management and gets a 403
  * everywhere else, even if it somehow bypasses the UI/page-level gate.
  */
 export async function requireAdmin(opts?: { role?: "admin" }) {
