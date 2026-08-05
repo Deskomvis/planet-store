@@ -15,11 +15,10 @@ export default async function AdminProtectedLayout({
       <header className="border-b border-neutral-200 bg-white">
         <div className="mx-auto flex max-w-5xl flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:gap-6">
-            <Link href="/admin" className="flex items-center gap-2.5 text-lg font-bold text-neutral-900">
+            <Link href="/admin" aria-label="Dashboard Admin Gudang Planet" className="flex items-center">
               <span className="flex shrink-0 items-center">
                 <Image src="/logo-gp-black.webp" alt="Gudang Planet" width={130} height={39} />
               </span>
-              Admin Gudang Planet
             </Link>
             <nav className="flex max-w-full items-center gap-4 overflow-x-auto pb-1 sm:pb-0">
               <Link href="/admin" className="text-sm font-medium text-neutral-600 hover:text-neutral-900">
