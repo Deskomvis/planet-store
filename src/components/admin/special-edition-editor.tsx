@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type ChangeEvent } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ImageInput } from "@/components/admin/image-input";
@@ -26,7 +27,7 @@ function makeBlock(type: SpecialEditionBlock["type"]): SpecialEditionBlock {
     linkLabel: type === "cta" || type === "product" ? "Lihat koleksi" : "",
     linkUrl: "",
     items: type === "features" ? ["Material pilihan", "Jumlah terbatas", "Detail eksklusif"] : [],
-    variants: type === "variants" ? [{ id: `variant-${Date.now()}`, name: "Varian 01", description: "", imageUrl: "" }] : [],
+    variants: [],
     align: "left",
   };
 }
@@ -41,6 +42,7 @@ export function SpecialEditionEditor({ initialValue, pageId }: { initialValue: S
   const [error, setError] = useState<string | null>(null);
   const [variantUploading, setVariantUploading] = useState<{ blockId: string; done: number; total: number } | null>(null);
   const [variantUploadError, setVariantUploadError] = useState<{ blockId: string; message: string } | null>(null);
+  const [variantSelection, setVariantSelection] = useState<{ blockId: string; ids: Set<string> } | null>(null);
 
   function updateBlock(index: number, patch: Partial<SpecialEditionBlock>) {
     setValue((current) => ({
@@ -56,6 +58,15 @@ export function SpecialEditionEditor({ initialValue, pageId }: { initialValue: S
       const blocks = [...current.blocks];
       [blocks[index], blocks[target]] = [blocks[target], blocks[index]];
       return { ...current, blocks };
+    });
+  }
+
+  function toggleVariantSelection(blockId: string, variantId: string) {
+    setVariantSelection((current) => {
+      const ids = new Set(current?.blockId === blockId ? current.ids : []);
+      if (ids.has(variantId)) ids.delete(variantId);
+      else ids.add(variantId);
+      return { blockId, ids };
     });
   }
 
@@ -208,27 +219,27 @@ export function SpecialEditionEditor({ initialValue, pageId }: { initialValue: S
               </div>
 
               <div className="mt-4 grid gap-4 md:grid-cols-2">
-                <label className="text-sm font-medium text-neutral-700">Label kecil<input value={block.eyebrow} onChange={(e) => updateBlock(index, { eyebrow: e.target.value })} className={inputClass} /></label>
-                <label className="text-sm font-medium text-neutral-700">Judul<input value={block.title} onChange={(e) => updateBlock(index, { title: e.target.value })} className={inputClass} /></label>
-                <label className="text-sm font-medium text-neutral-700 md:col-span-2">Deskripsi<textarea value={block.body} onChange={(e) => updateBlock(index, { body: e.target.value })} className={`${inputClass} min-h-20`} /></label>
+                {block.type !== "variants" ? <>
+                  <label className="text-sm font-medium text-neutral-700">Label kecil<input value={block.eyebrow} onChange={(e) => updateBlock(index, { eyebrow: e.target.value })} className={inputClass} /></label>
+                  <label className="text-sm font-medium text-neutral-700">Judul<input value={block.title} onChange={(e) => updateBlock(index, { title: e.target.value })} className={inputClass} /></label>
+                  <label className="text-sm font-medium text-neutral-700 md:col-span-2">Deskripsi<textarea value={block.body} onChange={(e) => updateBlock(index, { body: e.target.value })} className={`${inputClass} min-h-20`} /></label>
+                </> : null}
                 {(block.type === "editorial" || block.type === "product") ? <div className="md:col-span-2"><ImageInput id={`block-image-${block.id}`} label="Gambar blok" value={block.imageUrl} onChange={(imageUrl) => updateBlock(index, { imageUrl })} /></div> : null}
                 {block.type === "features" ? <label className="text-sm font-medium text-neutral-700 md:col-span-2">Keunggulan (satu per baris)<textarea value={block.items.join("\n")} onChange={(e) => updateBlock(index, { items: e.target.value.split("\n").slice(0, 8) })} className={`${inputClass} min-h-28`} /></label> : null}
                 {block.type === "variants" ? <div className="space-y-3 md:col-span-2">
-                  <div className="flex flex-wrap items-center justify-between gap-2"><p className="text-sm font-semibold text-neutral-800">Daftar varian</p><div className="flex flex-wrap gap-2"><label className={`cursor-pointer rounded-full border border-neutral-900 px-3 py-1.5 text-xs font-semibold text-neutral-900 hover:bg-neutral-100 ${variantUploading ? "pointer-events-none opacity-50" : ""}`}>+ Upload banyak gambar<input type="file" multiple accept="image/jpeg,image/png,image/webp,image/gif" disabled={Boolean(variantUploading)} onChange={(event) => uploadVariantImages(index, block, event)} className="sr-only" /></label><button type="button" disabled={Boolean(variantUploading) || block.variants.length >= 24} onClick={() => updateBlock(index, { variants: [...block.variants, { id: `variant-${Date.now()}`, name: `Varian ${String(block.variants.length + 1).padStart(2, "0")}`, description: "", imageUrl: "" }] })} className="rounded-full bg-neutral-900 px-3 py-1.5 text-xs font-medium text-white disabled:opacity-40">+ Tambah manual</button></div></div>
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    {variantSelection?.blockId === block.id ? <div className="flex items-center gap-2"><button type="button" aria-label="Batalkan pilihan" onClick={() => setVariantSelection(null)} className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-neutral-100">×</button><p className="text-sm font-bold text-neutral-900">{variantSelection.ids.size} gambar dipilih</p></div> : <p className="text-sm font-bold text-neutral-900">Gambar varian <span className="font-normal text-neutral-500">({block.variants.length})</span></p>}
+                    <div className="flex flex-wrap gap-2">
+                      {variantSelection?.blockId === block.id ? <><button type="button" onClick={() => setVariantSelection({ blockId: block.id, ids: variantSelection.ids.size === block.variants.length ? new Set() : new Set(block.variants.map((variant) => variant.id)) })} className="rounded-full border border-neutral-300 px-3 py-1.5 text-xs font-semibold text-neutral-700 hover:bg-neutral-100">{variantSelection.ids.size === block.variants.length ? "Batalkan Semua" : "Pilih Semua"}</button><button type="button" disabled={variantSelection.ids.size === 0} onClick={() => { updateBlock(index, { variants: block.variants.filter((variant) => !variantSelection.ids.has(variant.id)) }); setVariantSelection(null); }} className="rounded-full bg-red-600 px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-40">Hapus dipilih</button></> : <>{block.variants.length > 0 ? <button type="button" onClick={() => setVariantSelection({ blockId: block.id, ids: new Set() })} className="rounded-full border border-neutral-300 px-3 py-1.5 text-xs font-semibold text-neutral-700 hover:bg-neutral-100">Pilih</button> : null}<label className={`cursor-pointer rounded-full bg-neutral-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-neutral-700 ${variantUploading ? "pointer-events-none opacity-50" : ""}`}>+ Upload gambar<input type="file" multiple accept="image/jpeg,image/png,image/webp,image/gif" disabled={Boolean(variantUploading)} onChange={(event) => uploadVariantImages(index, block, event)} className="sr-only" /></label></>}
+                    </div>
+                  </div>
                   {variantUploading?.blockId === block.id ? <p className="text-xs text-neutral-500">Mengunggah gambar {Math.min(variantUploading.done + 1, variantUploading.total)} dari {variantUploading.total}...</p> : null}
                   {variantUploadError?.blockId === block.id ? <p className="text-xs text-red-600">{variantUploadError.message}</p> : null}
-                  <div className="grid grid-cols-2 gap-3">
-                    {block.variants.map((variant, variantIndex) => <div key={variant.id} className="rounded-lg border border-neutral-200 p-3">
-                      <div className="flex justify-between gap-2"><p className="text-xs font-bold text-neutral-500">VARIAN {variantIndex + 1}</p><button type="button" onClick={() => updateBlock(index, { variants: block.variants.filter((item) => item.id !== variant.id) })} className="text-xs text-red-600">Hapus</button></div>
-                      <label className="mt-2 block text-xs font-medium text-neutral-700">Nama<input value={variant.name} onChange={(e) => updateBlock(index, { variants: block.variants.map((item) => item.id === variant.id ? { ...item, name: e.target.value } : item) })} className={inputClass} /></label>
-                      <label className="mt-2 block text-xs font-medium text-neutral-700">Deskripsi<input value={variant.description} onChange={(e) => updateBlock(index, { variants: block.variants.map((item) => item.id === variant.id ? { ...item, description: e.target.value } : item) })} className={inputClass} /></label>
-                      <div className="mt-3"><ImageInput id={`variant-${block.id}-${variant.id}`} label="Gambar varian" value={variant.imageUrl} onChange={(imageUrl) => updateBlock(index, { variants: block.variants.map((item) => item.id === variant.id ? { ...item, imageUrl } : item) })} /></div>
-                    </div>)}
-                  </div>
+                  {block.variants.length > 0 ? <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">{block.variants.map((variant) => { const selected = variantSelection?.blockId === block.id && variantSelection.ids.has(variant.id); return <button type="button" key={variant.id} disabled={variantSelection?.blockId !== block.id} onClick={() => toggleVariantSelection(block.id, variant.id)} className={`group relative aspect-square overflow-hidden rounded-lg border bg-neutral-100 text-left ${selected ? "border-blue-600 ring-2 ring-blue-600" : "border-neutral-200"}`}>{variant.imageUrl ? <Image src={variant.imageUrl} alt="Gambar varian" fill sizes="(max-width:640px) 50vw, 25vw" className="object-cover" /> : <span className="flex h-full items-center justify-center text-xs text-neutral-400">Tidak ada gambar</span>}{variantSelection?.blockId === block.id ? <span className={`absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full border-2 border-white text-xs font-bold text-white ${selected ? "bg-blue-600" : "bg-black/30"}`}>{selected ? "✓" : ""}</span> : null}</button>; })}</div> : <div className="rounded-xl border border-dashed border-neutral-300 p-10 text-center text-sm text-neutral-500">Belum ada gambar varian. Upload beberapa gambar sekaligus.</div>}
                 </div> : null}
                 {(block.type === "product" || block.type === "cta") ? <><label className="text-sm font-medium text-neutral-700">Teks tombol<input value={block.linkLabel} onChange={(e) => updateBlock(index, { linkLabel: e.target.value })} className={inputClass} /></label><label className="text-sm font-medium text-neutral-700">Tautan<input value={block.linkUrl} onChange={(e) => updateBlock(index, { linkUrl: e.target.value })} className={inputClass} placeholder="/kategori/... atau https://..." /></label></> : null}
                 {(block.type === "editorial" || block.type === "product") ? <label className="text-sm font-medium text-neutral-700">Posisi gambar<select value={block.align} onChange={(e) => updateBlock(index, { align: e.target.value as "left" | "right" })} className={inputClass}><option value="left">Kiri</option><option value="right">Kanan</option></select></label> : null}
-                <label className="flex items-center gap-2 text-sm font-medium text-neutral-700"><input type="checkbox" checked={block.enabled} onChange={(e) => updateBlock(index, { enabled: e.target.checked })} /> Tampilkan blok</label>
+                {block.type !== "variants" ? <label className="flex items-center gap-2 text-sm font-medium text-neutral-700"><input type="checkbox" checked={block.enabled} onChange={(e) => updateBlock(index, { enabled: e.target.checked })} /> Tampilkan blok</label> : null}
               </div>
             </article>
           ))}
