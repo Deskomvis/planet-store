@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ChangeEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ImageInput } from "@/components/admin/image-input";
@@ -39,6 +39,8 @@ export function SpecialEditionEditor({ initialValue, pageId }: { initialValue: S
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [variantUploading, setVariantUploading] = useState<{ blockId: string; done: number; total: number } | null>(null);
+  const [variantUploadError, setVariantUploadError] = useState<{ blockId: string; message: string } | null>(null);
 
   function updateBlock(index: number, patch: Partial<SpecialEditionBlock>) {
     setValue((current) => ({
@@ -55,6 +57,58 @@ export function SpecialEditionEditor({ initialValue, pageId }: { initialValue: S
       [blocks[index], blocks[target]] = [blocks[target], blocks[index]];
       return { ...current, blocks };
     });
+  }
+
+  async function uploadVariantImages(
+    blockIndex: number,
+    block: SpecialEditionBlock,
+    event: ChangeEvent<HTMLInputElement>,
+  ) {
+    const input = event.currentTarget;
+    const isStarterPlaceholder = block.variants.length === 1
+      && block.variants[0].name === "Varian 01"
+      && !block.variants[0].description
+      && !block.variants[0].imageUrl;
+    const existingVariants = isStarterPlaceholder ? [] : block.variants;
+    const availableSlots = 24 - existingVariants.length;
+    const files = Array.from(input.files ?? []).slice(0, Math.max(availableSlots, 0));
+    if (files.length === 0) {
+      if ((input.files?.length ?? 0) > 0) setVariantUploadError({ blockId: block.id, message: "Maksimal 24 varian dalam satu blok." });
+      input.value = "";
+      return;
+    }
+
+    setVariantUploadError(null);
+    setVariantUploading({ blockId: block.id, done: 0, total: files.length });
+    const uploaded: SpecialEditionBlock["variants"] = [];
+    const startNumber = existingVariants.length + 1;
+
+    for (const [fileIndex, file] of files.entries()) {
+      try {
+        const formData = new FormData();
+        formData.append("file", file);
+        const response = await fetch("/api/upload", { method: "POST", body: formData });
+        const responseText = await response.text();
+        const data = responseText ? JSON.parse(responseText) as { url?: string; error?: string } : {};
+        if (!response.ok || !data.url) throw new Error(data.error ?? `Gagal mengunggah ${file.name}`);
+        uploaded.push({
+          id: `variant-upload-${file.lastModified}-${file.size}-${fileIndex}`,
+          name: `Varian ${String(startNumber + fileIndex).padStart(2, "0")}`,
+          description: "",
+          imageUrl: data.url,
+        });
+      } catch (uploadError) {
+        setVariantUploadError({ blockId: block.id, message: uploadError instanceof Error ? uploadError.message : "Gagal mengunggah salah satu gambar" });
+      } finally {
+        setVariantUploading((current) => current ? { ...current, done: current.done + 1 } : null);
+      }
+    }
+
+    if (uploaded.length > 0) {
+      updateBlock(blockIndex, { variants: [...existingVariants, ...uploaded] });
+    }
+    setVariantUploading(null);
+    input.value = "";
   }
 
   async function save() {
@@ -160,8 +214,10 @@ export function SpecialEditionEditor({ initialValue, pageId }: { initialValue: S
                 {(block.type === "editorial" || block.type === "product") ? <div className="md:col-span-2"><ImageInput id={`block-image-${block.id}`} label="Gambar blok" value={block.imageUrl} onChange={(imageUrl) => updateBlock(index, { imageUrl })} /></div> : null}
                 {block.type === "features" ? <label className="text-sm font-medium text-neutral-700 md:col-span-2">Keunggulan (satu per baris)<textarea value={block.items.join("\n")} onChange={(e) => updateBlock(index, { items: e.target.value.split("\n").slice(0, 8) })} className={`${inputClass} min-h-28`} /></label> : null}
                 {block.type === "variants" ? <div className="space-y-3 md:col-span-2">
-                  <div className="flex items-center justify-between"><p className="text-sm font-semibold text-neutral-800">Daftar varian</p><button type="button" onClick={() => updateBlock(index, { variants: [...block.variants, { id: `variant-${Date.now()}`, name: `Varian ${String(block.variants.length + 1).padStart(2, "0")}`, description: "", imageUrl: "" }] })} className="rounded-full bg-neutral-900 px-3 py-1.5 text-xs font-medium text-white">+ Tambah varian</button></div>
-                  <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="flex flex-wrap items-center justify-between gap-2"><p className="text-sm font-semibold text-neutral-800">Daftar varian</p><div className="flex flex-wrap gap-2"><label className={`cursor-pointer rounded-full border border-neutral-900 px-3 py-1.5 text-xs font-semibold text-neutral-900 hover:bg-neutral-100 ${variantUploading ? "pointer-events-none opacity-50" : ""}`}>+ Upload banyak gambar<input type="file" multiple accept="image/jpeg,image/png,image/webp,image/gif" disabled={Boolean(variantUploading)} onChange={(event) => uploadVariantImages(index, block, event)} className="sr-only" /></label><button type="button" disabled={Boolean(variantUploading) || block.variants.length >= 24} onClick={() => updateBlock(index, { variants: [...block.variants, { id: `variant-${Date.now()}`, name: `Varian ${String(block.variants.length + 1).padStart(2, "0")}`, description: "", imageUrl: "" }] })} className="rounded-full bg-neutral-900 px-3 py-1.5 text-xs font-medium text-white disabled:opacity-40">+ Tambah manual</button></div></div>
+                  {variantUploading?.blockId === block.id ? <p className="text-xs text-neutral-500">Mengunggah gambar {Math.min(variantUploading.done + 1, variantUploading.total)} dari {variantUploading.total}...</p> : null}
+                  {variantUploadError?.blockId === block.id ? <p className="text-xs text-red-600">{variantUploadError.message}</p> : null}
+                  <div className="grid grid-cols-2 gap-3">
                     {block.variants.map((variant, variantIndex) => <div key={variant.id} className="rounded-lg border border-neutral-200 p-3">
                       <div className="flex justify-between gap-2"><p className="text-xs font-bold text-neutral-500">VARIAN {variantIndex + 1}</p><button type="button" onClick={() => updateBlock(index, { variants: block.variants.filter((item) => item.id !== variant.id) })} className="text-xs text-red-600">Hapus</button></div>
                       <label className="mt-2 block text-xs font-medium text-neutral-700">Nama<input value={variant.name} onChange={(e) => updateBlock(index, { variants: block.variants.map((item) => item.id === variant.id ? { ...item, name: e.target.value } : item) })} className={inputClass} /></label>
