@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { SiteFooter } from "@/components/site-footer";
+import { SpecialEditionVariantGrid } from "@/components/special-edition-variant-grid";
 import type { SpecialEditionBlock } from "@/lib/validation";
 
 export const revalidate = 3600;
@@ -58,7 +59,7 @@ export function SpecialEditionView({ page }: { page: SpecialEditionPageData }) {
         {blocks.map((block, index) => {
           if (block.type === "editorial" || block.type === "product") return <EditorialBlock key={block.id} block={block} index={index} />;
           if (block.type === "features") return <section key={block.id} className="border-y border-white/10 bg-[#0e0e0e]"><div className="mx-auto max-w-7xl px-5 py-16 sm:px-8 md:py-24 lg:px-12"><div className="grid gap-12 md:grid-cols-2"><div>{block.eyebrow ? <p className="text-[10px] font-bold uppercase tracking-[0.35em] text-amber-200/70">{block.eyebrow}</p> : null}<h2 className="mt-5 max-w-xl font-serif text-4xl leading-none text-stone-100 sm:text-5xl">{block.title}</h2>{block.body ? <p className="mt-6 max-w-md text-sm leading-7 text-stone-400">{block.body}</p> : null}</div><ol className="divide-y divide-white/10 border-t border-white/10">{block.items.filter(Boolean).map((item, itemIndex) => <li key={`${block.id}-${itemIndex}`} className="flex items-center gap-6 py-5"><span className="text-[10px] tracking-widest text-amber-200/50">0{itemIndex + 1}</span><span className="text-sm uppercase tracking-[0.16em] text-stone-200">{item}</span></li>)}</ol></div></div></section>;
-          if (block.type === "variants") return <section key={block.id} className="mx-auto max-w-7xl px-5 py-16 sm:px-8 md:py-24 lg:px-12"><div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4">{block.variants.filter((variant) => variant.imageUrl).map((variant) => <div key={variant.id} className="group relative aspect-square overflow-hidden bg-neutral-900"> <Image src={variant.imageUrl} alt="Varian Special Edition" fill sizes="(max-width:640px) 50vw, (max-width:1024px) 33vw, 25vw" className="object-cover transition-transform duration-500 group-hover:scale-[1.03]" /></div>)}</div></section>;
+          if (block.type === "variants") return <section key={block.id} className="mx-auto max-w-7xl px-5 py-16 sm:px-8 md:py-24 lg:px-12"><SpecialEditionVariantGrid variants={block.variants.filter((variant) => variant.imageUrl).map((variant) => ({ ...variant, imageUrl: variant.imageUrl! }))} /></section>;
           return <section key={block.id} className="relative overflow-hidden px-5 py-24 text-center sm:px-8 md:py-36"><div className="absolute inset-0 bg-[radial-gradient(circle_at_center,#27241f_0%,#090909_62%)]" /><div className="relative mx-auto max-w-4xl">{block.eyebrow ? <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-amber-200/70">{block.eyebrow}</p> : null}<h2 className="mt-6 font-serif text-5xl leading-[0.92] text-white sm:text-7xl">{block.title}</h2>{block.body ? <p className="mx-auto mt-6 max-w-xl text-sm leading-7 text-stone-400">{block.body}</p> : null}<ActionLink href={block.linkUrl} label={block.linkLabel} /></div></section>;
         })}
       </main><div className="border-t border-white/10 [&_footer]:border-white/10 [&_footer]:bg-black [&_footer]:text-stone-400"><SiteFooter /></div>
