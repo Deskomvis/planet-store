@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { BulkDownloadDialog } from "@/components/bulk-download-dialog";
-import { filenameFromUrl } from "@/lib/share";
+import { downloadFiles, filenameFromUrl } from "@/lib/share";
 
 type SpecialEditionVariant = {
   id: string;
@@ -14,7 +13,7 @@ type SpecialEditionVariant = {
 export function SpecialEditionVariantGrid({ variants }: { variants: SpecialEditionVariant[] }) {
   const [selectMode, setSelectMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [downloadFiles, setDownloadFiles] = useState<{ url: string; filename: string }[] | null>(null);
+  const [downloading, setDownloading] = useState(false);
 
   function exitSelectMode() {
     setSelectMode(false);
@@ -30,14 +29,21 @@ export function SpecialEditionVariantGrid({ variants }: { variants: SpecialEditi
     });
   }
 
-  function handleDownload() {
+  async function handleDownload() {
+    if (downloading) return;
     const files = variants
       .filter((variant) => selectedIds.has(variant.id))
       .map((variant) => ({
         url: variant.imageUrl,
         filename: filenameFromUrl(variant.imageUrl, variant.name || "Varian Special Edition"),
       }));
-    if (files.length > 0) setDownloadFiles(files);
+    if (files.length === 0) return;
+    setDownloading(true);
+    try {
+      await downloadFiles(files, "special-edition-terpilih.zip");
+    } finally {
+      setDownloading(false);
+    }
   }
 
   return (
@@ -61,14 +67,9 @@ export function SpecialEditionVariantGrid({ variants }: { variants: SpecialEditi
         {variants.map((variant) => {
           const selected = selectedIds.has(variant.id);
           return (
-            <button
+            <div
               key={variant.id}
-              type="button"
-              disabled={!selectMode}
-              onClick={() => toggleSelected(variant.id)}
-              aria-pressed={selectMode ? selected : undefined}
-              aria-label={selectMode ? `Pilih ${variant.name || "varian"}` : variant.name || "Varian Special Edition"}
-              className="group relative aspect-square overflow-hidden bg-neutral-900 text-left disabled:cursor-default"
+              className="group relative aspect-square overflow-hidden bg-neutral-900"
             >
               <Image
                 src={variant.imageUrl}
@@ -80,12 +81,19 @@ export function SpecialEditionVariantGrid({ variants }: { variants: SpecialEditi
               {selectMode ? (
                 <>
                   <div className={`absolute inset-0 transition-colors ${selected ? "bg-black/35" : "bg-black/0"}`} />
-                  <span className={`absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full border-2 border-white text-sm font-bold text-white ${selected ? "bg-blue-600" : "bg-black/25"}`}>
+                  <button
+                    type="button"
+                    onClick={() => toggleSelected(variant.id)}
+                    aria-pressed={selected}
+                    aria-label={`Pilih ${variant.name || "varian"}`}
+                    className="absolute inset-0 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                  />
+                  <span className={`pointer-events-none absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full border-2 border-white text-sm font-bold text-white ${selected ? "bg-blue-600" : "bg-black/25"}`}>
                     {selected ? "✓" : ""}
                   </span>
                 </>
               ) : null}
-            </button>
+            </div>
           );
         })}
       </div>
@@ -98,18 +106,18 @@ export function SpecialEditionVariantGrid({ variants }: { variants: SpecialEditi
             <button
               type="button"
               onClick={handleDownload}
-              className="flex cursor-pointer items-center gap-1.5 rounded-full bg-white/10 px-3.5 py-1.5 text-sm font-medium text-white transition-colors hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              disabled={downloading}
+              className="flex cursor-pointer items-center gap-1.5 rounded-full bg-white/10 px-3.5 py-1.5 text-sm font-medium text-white transition-colors hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:cursor-not-allowed disabled:opacity-50"
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" />
               </svg>
-              Download
+              {downloading ? "Menyiapkan..." : "Download"}
             </button>
           </div>
         </div>
       ) : null}
 
-      {downloadFiles ? <BulkDownloadDialog files={downloadFiles} onClose={() => setDownloadFiles(null)} /> : null}
     </>
   );
 }

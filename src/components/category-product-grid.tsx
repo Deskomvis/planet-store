@@ -4,8 +4,7 @@ import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { ProductCard } from "@/components/product-card";
 import { ProductLightbox, type LightboxProduct } from "@/components/product-lightbox";
-import { BulkDownloadDialog } from "@/components/bulk-download-dialog";
-import { filenameFromUrl, shareImages } from "@/lib/share";
+import { downloadFiles, filenameFromUrl, shareImages } from "@/lib/share";
 
 export function CategoryProductGrid({
   products,
@@ -22,9 +21,7 @@ export function CategoryProductGrid({
 
   const [selectMode, setSelectMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [downloadDialogFiles, setDownloadDialogFiles] = useState<{ url: string; filename: string }[] | null>(
-    null
-  );
+  const [downloading, setDownloading] = useState(false);
   const [sharing, setSharing] = useState(false);
 
   const filtered = q
@@ -47,13 +44,20 @@ export function CategoryProductGrid({
 
   const selectedProducts = products.filter((p) => selectedIds.has(p.id) && p.imageUrl);
 
-  function handleBulkDownload() {
-    setDownloadDialogFiles(
-      selectedProducts.map((p) => ({
+  async function handleBulkDownload() {
+    if (downloading) return;
+    setDownloading(true);
+    try {
+      await downloadFiles(
+        selectedProducts.map((p) => ({
         url: p.imageUrl!,
         filename: filenameFromUrl(p.imageUrl!, p.name),
-      }))
-    );
+        })),
+        `${categorySlug}-terpilih.zip`
+      );
+    } finally {
+      setDownloading(false);
+    }
   }
 
   async function handleBulkShare() {
@@ -127,7 +131,8 @@ export function CategoryProductGrid({
             <button
               type="button"
               onClick={handleBulkDownload}
-              className="flex cursor-pointer items-center gap-1.5 rounded-full bg-white/10 px-3.5 py-1.5 text-sm font-medium text-white transition-colors hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              disabled={downloading}
+              className="flex cursor-pointer items-center gap-1.5 rounded-full bg-white/10 px-3.5 py-1.5 text-sm font-medium text-white transition-colors hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:cursor-not-allowed disabled:opacity-50"
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path
@@ -136,7 +141,7 @@ export function CategoryProductGrid({
                   d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3"
                 />
               </svg>
-              Download
+              {downloading ? "Menyiapkan..." : "Download"}
             </button>
             <button
               type="button"
@@ -157,9 +162,6 @@ export function CategoryProductGrid({
         </div>
       ) : null}
 
-      {downloadDialogFiles ? (
-        <BulkDownloadDialog files={downloadDialogFiles} onClose={() => setDownloadDialogFiles(null)} />
-      ) : null}
     </>
   );
 }
