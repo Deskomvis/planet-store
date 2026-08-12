@@ -48,13 +48,10 @@ export function CategoryProductGrid({
     if (downloading) return;
     setDownloading(true);
     try {
-      await downloadFiles(
-        selectedProducts.map((p) => ({
+      downloadFiles(selectedProducts.map((p) => ({
         url: p.imageUrl!,
         filename: filenameFromUrl(p.imageUrl!, p.name),
-        })),
-        `${categorySlug}-terpilih.zip`
-      );
+      })));
     } finally {
       setDownloading(false);
     }

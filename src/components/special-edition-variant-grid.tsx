@@ -40,7 +40,7 @@ export function SpecialEditionVariantGrid({ variants }: { variants: SpecialEditi
     if (files.length === 0) return;
     setDownloading(true);
     try {
-      await downloadFiles(files, "special-edition-terpilih.zip");
+      downloadFiles(files);
     } finally {
       setDownloading(false);
     }

@@ -64,13 +64,10 @@ export function CategoryProductsManager({
     const selected = products.filter((p) => selectedIds.has(p.id) && p.imageUrl);
     setDownloading(true);
     try {
-      await downloadFiles(
-        selected.map((product) => ({
+      downloadFiles(selected.map((product) => ({
           url: product.imageUrl!,
           filename: filenameFromUrl(product.imageUrl!, product.name),
-        })),
-        `${categoryName}-terpilih.zip`
-      );
+        })));
     } finally {
       setDownloading(false);
     }

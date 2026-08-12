@@ -24,31 +24,9 @@ export async function downloadFile(url: string, filename: string) {
   a.remove();
 }
 
-/** Downloads all selected images in one ZIP, avoiding browser multi-download blocking. */
-export async function downloadFiles(
-  files: { url: string; filename: string }[],
-  archiveName = "gambar-terpilih.zip"
-) {
-  if (files.length === 0) return;
-
-  const response = await fetch("/api/download/batch", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ files }),
-  });
-  if (!response.ok) {
-    const result = await response.json().catch(() => null);
-    throw new Error(result?.error ?? "Gagal menyiapkan file download");
-  }
-
-  const blobUrl = URL.createObjectURL(await response.blob());
-  const a = document.createElement("a");
-  a.href = blobUrl;
-  a.download = archiveName.endsWith(".zip") ? archiveName : `${archiveName}.zip`;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  setTimeout(() => URL.revokeObjectURL(blobUrl), 1_000);
+/** Starts a separate browser download for every selected image. */
+export function downloadFiles(files: { url: string; filename: string }[]) {
+  for (const file of files) downloadFile(file.url, file.filename);
 }
 
 /** Shares one or more images via the native share sheet when available. */

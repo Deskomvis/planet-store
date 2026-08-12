@@ -81,10 +81,8 @@ export function SpecialEditionEditor({ initialValue, pageId }: { initialValue: S
       && !block.variants[0].description
       && !block.variants[0].imageUrl;
     const existingVariants = isStarterPlaceholder ? [] : block.variants;
-    const availableSlots = 24 - existingVariants.length;
-    const files = Array.from(input.files ?? []).slice(0, Math.max(availableSlots, 0));
+    const files = Array.from(input.files ?? []);
     if (files.length === 0) {
-      if ((input.files?.length ?? 0) > 0) setVariantUploadError({ blockId: block.id, message: "Maksimal 24 varian dalam satu blok." });
       input.value = "";
       return;
     }

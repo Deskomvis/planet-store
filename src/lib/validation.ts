@@ -56,7 +56,7 @@ const specialEditionBlockSchema = z.object({
     name: z.string().trim().max(120),
     description: z.string().trim().max(300).optional().default(""),
     imageUrl: z.union([z.string().url("URL gambar varian tidak valid"), z.literal("")]).optional().default(""),
-  })).max(24).optional().default([]),
+  })).optional().default([]),
   align: z.enum(["left", "right"]).optional().default("left"),
 });
 
