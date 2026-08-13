@@ -64,7 +64,7 @@ export function SpecialEditionVariantGrid({ variants }: { variants: SpecialEditi
         ) : null}
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4">
+      <div className="grid grid-cols-3 gap-2 sm:gap-5 lg:grid-cols-4">
         {variants.map((variant) => {
           const selected = selectedIds.has(variant.id);
           return (
@@ -86,7 +86,7 @@ export function SpecialEditionVariantGrid({ variants }: { variants: SpecialEditi
                 src={variant.imageUrl}
                 alt={variant.name || "Varian Special Edition"}
                 fill
-                sizes="(max-width:640px) 50vw, (max-width:1024px) 33vw, 25vw"
+                sizes="(max-width:1024px) 33vw, 25vw"
                 className={`object-cover transition-transform duration-500 ${selectMode ? "" : "group-hover:scale-[1.03]"}`}
               />
               {selectMode ? (
