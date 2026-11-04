@@ -49,11 +49,14 @@ export async function POST(request: NextRequest) {
       slug,
       description: parsed.data.description || null,
       inStock: parsed.data.inStock ?? true,
+      price: parsed.data.price,
+      originalPrice: parsed.data.originalPrice,
       imageUrl: parsed.data.imageUrl || null,
       categoryId: parsed.data.categoryId,
     },
   });
 
+  revalidatePath("/katalog-harga");
   revalidatePath(`/kategori/${category.slug}`);
 
   return NextResponse.json({ product }, { status: 201 });

@@ -9,6 +9,8 @@ export type ManagedProduct = {
   name: string;
   description: string | null;
   inStock: boolean;
+  price: number | null;
+  originalPrice: number | null;
   imageUrl: string | null;
 };
 
@@ -25,6 +27,8 @@ export function ProductEditDialog({
 }) {
   const [name, setName] = useState(product.name);
   const [description, setDescription] = useState(product.description ?? "");
+  const [price, setPrice] = useState(product.price?.toString() ?? "");
+  const [originalPrice, setOriginalPrice] = useState(product.originalPrice?.toString() ?? "");
   const [inStock, setInStock] = useState(product.inStock);
   const [imageUrl, setImageUrl] = useState(product.imageUrl ?? "");
   const [error, setError] = useState<string | null>(null);
@@ -49,6 +53,8 @@ export function ProductEditDialog({
           name,
           description: description.trim() || null,
           inStock,
+          price: price === "" ? null : Number(price),
+          originalPrice: originalPrice === "" ? null : Number(originalPrice),
           imageUrl: imageUrl.trim() === "" ? null : imageUrl.trim(),
           categoryId,
         }),
@@ -121,6 +127,16 @@ export function ProductEditDialog({
             />
           </div>
 
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label htmlFor="product-price" className="block text-sm font-medium text-neutral-700">Harga (Rp)</label>
+              <input id="product-price" type="number" min="0" step="1" value={price} onChange={(e) => setPrice(e.target.value)} className="mt-1 w-full rounded border border-neutral-300 px-3 py-2 text-sm" placeholder="Opsional" />
+            </div>
+            <div>
+              <label htmlFor="product-original-price" className="block text-sm font-medium text-neutral-700">Harga awal (Rp)</label>
+              <input id="product-original-price" type="number" min="0" step="1" value={originalPrice} onChange={(e) => setOriginalPrice(e.target.value)} className="mt-1 w-full rounded border border-neutral-300 px-3 py-2 text-sm" placeholder="Opsional" />
+            </div>
+          </div>
           <ImageInput id="product-image" label="Gambar Produk" value={imageUrl} onChange={setImageUrl} />
 
           {imageUrl && imageUrl === product.imageUrl ? (

@@ -31,6 +31,8 @@ model Product {
   slug        String   @unique
   description String?
   inStock     Boolean  @default(true)
+  price       Int?
+  originalPrice Int?
   imageUrl    String?
   categoryId  String
   category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)

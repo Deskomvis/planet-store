@@ -48,11 +48,14 @@ export async function PUT(request: NextRequest, { params }: Params) {
       slug,
       description: parsed.data.description || null,
       inStock: parsed.data.inStock ?? true,
+      price: parsed.data.price,
+      originalPrice: parsed.data.originalPrice,
       imageUrl: parsed.data.imageUrl || null,
       categoryId: parsed.data.categoryId,
     },
   });
 
+  revalidatePath("/katalog-harga");
   revalidatePath(`/kategori/${category.slug}`);
   if (existing && existing.category.slug !== category.slug) {
     revalidatePath(`/kategori/${existing.category.slug}`);
@@ -72,6 +75,7 @@ export async function DELETE(_request: NextRequest, { params }: Params) {
   });
   await prisma.product.delete({ where: { id } });
 
+  revalidatePath("/katalog-harga");
   if (existing) revalidatePath(`/kategori/${existing.category.slug}`);
 
   return NextResponse.json({ ok: true });

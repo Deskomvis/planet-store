@@ -10,6 +10,8 @@ export const productSchema = z.object({
   name: z.string().trim().min(2, "Nama produk minimal 2 karakter").max(150),
   description: z.string().trim().max(2000).optional().nullable(),
   inStock: z.boolean().optional().default(true),
+  price: z.number().int().min(0).max(2147483647).nullable().optional(),
+  originalPrice: z.number().int().min(0).max(2147483647).nullable().optional(),
   imageUrl: z.union([z.string().url("URL gambar tidak valid"), z.literal(""), z.null()]).optional(),
   categoryId: z.string().min(1, "Kategori wajib dipilih"),
 });
