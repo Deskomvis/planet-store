@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { SpecialEditionView } from "@/app/special-edition/page";
 
-export const revalidate = 3600;
+export const revalidate = false;
 
 export async function generateStaticParams() {
   const pages = await prisma.specialEditionPage.findMany({ where: { published: true }, select: { slug: true } });

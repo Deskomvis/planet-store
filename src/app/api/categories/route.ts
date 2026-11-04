@@ -47,6 +47,7 @@ export async function POST(request: NextRequest) {
   });
 
   revalidatePath("/");
+  revalidatePath(`/kategori/${category.slug}`);
 
   return NextResponse.json({ category }, { status: 201 });
 }

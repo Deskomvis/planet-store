@@ -7,7 +7,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { SpecialEditionVariantGrid } from "@/components/special-edition-variant-grid";
 import type { SpecialEditionBlock } from "@/lib/validation";
 
-export const revalidate = 3600;
+export const revalidate = false;
 
 export const metadata: Metadata = {
   title: "Special Edition | Gudang Planet",

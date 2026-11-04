@@ -42,6 +42,7 @@ export async function POST(request: NextRequest) {
     }});
 
     revalidatePath("/special-edition");
+    revalidatePath(`/special-edition/${saved.slug}`);
     return NextResponse.json({ page: saved }, { status: 201 });
   } catch (error) {
     console.error("Failed to create Special Edition page", error);

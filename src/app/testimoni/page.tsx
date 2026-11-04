@@ -5,7 +5,7 @@ import { prisma } from "@/lib/db";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 
-export const revalidate = 300;
+export const revalidate = false;
 
 export const metadata: Metadata = {
   title: "Testimoni Pelanggan",

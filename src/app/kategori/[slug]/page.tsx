@@ -7,7 +7,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { CategoryProductGrid } from "@/components/category-product-grid";
 
-export const revalidate = 300;
+export const revalidate = false;
 
 type Props = { params: Promise<{ slug: string }> };
 

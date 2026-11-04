@@ -7,7 +7,7 @@ import { CategoryGrid } from "@/components/category-grid";
 import { BannerSlider } from "@/components/banner-slider";
 import { extractMapEmbedSrc } from "@/lib/google-maps";
 
-export const revalidate = 300; // ISR: re-generate at most every 5 minutes
+export const revalidate = false;
 
 export const metadata: Metadata = {
   title: "Katalog Produk",
