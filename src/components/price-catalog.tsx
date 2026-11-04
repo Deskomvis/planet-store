@@ -7,7 +7,7 @@ type Product = { id: string; name: string; imageUrl: string | null; description:
 type Category = { id: string; name: string; description: string | null; products: Product[] };
 const rupiah = (amount: number) => new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(amount);
 
-function VariantSlider({ category }: { category: Category }) {
+export function VariantSlider({ category }: { category: Category }) {
   const [index, setIndex] = useState(0);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const product = category.products[index];
@@ -19,6 +19,7 @@ function VariantSlider({ category }: { category: Category }) {
     }
     setTouchStart(null);
   }
+  if (!product) return <p className="py-10 text-sm text-neutral-500">Belum ada produk di kategori ini.</p>;
   return (
     <div className="grid gap-6 border-t border-neutral-200 bg-neutral-50 p-4 sm:p-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] lg:gap-10">
       <div className="min-w-0">
@@ -53,21 +54,4 @@ function VariantSlider({ category }: { category: Category }) {
       </div>
     </div>
   );
-}
-
-export function PriceCatalog({ categories }: { categories: Category[] }) {
-  const [activeId, setActiveId] = useState<string | null>(null);
-  return <div className="mt-7 space-y-3">
-    {categories.length === 0 && <p className="py-10 text-sm text-neutral-500">Belum ada produk di katalog.</p>}
-    {categories.map((category) => {
-      const open = activeId === category.id;
-      return <section key={category.id} className="overflow-hidden rounded-2xl border border-neutral-200 bg-white">
-        <h2><button type="button" onClick={() => setActiveId(open ? null : category.id)} aria-expanded={open} aria-controls={`category-${category.id}`} className="flex w-full cursor-pointer items-center justify-between gap-4 p-5 text-left transition-colors hover:bg-neutral-50 sm:px-7 sm:py-6">
-          <span><span className="block text-lg font-semibold text-neutral-900 sm:text-xl">{category.name}</span><span className="mt-1 block text-sm font-normal text-neutral-500">{category.products.length} varian produk</span></span>
-          <span aria-hidden="true" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-xl">{open ? "−" : "+"}</span>
-        </button></h2>
-        <div id={`category-${category.id}`} hidden={!open}>{open && <VariantSlider category={category} />}</div>
-      </section>;
-    })}
-  </div>;
 }
