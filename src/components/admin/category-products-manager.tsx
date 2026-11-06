@@ -7,6 +7,7 @@ import { StockBadge } from "@/components/stock-badge";
 import { DeleteButton } from "@/components/admin/delete-button";
 import { ConfirmDialog } from "@/components/admin/confirm-dialog";
 import { ProductEditDialog, type ManagedProduct } from "@/components/admin/product-edit-dialog";
+import { BulkProductDialog } from "@/components/admin/bulk-product-dialog";
 import { downloadFiles, filenameFromUrl } from "@/lib/share";
 
 export function CategoryProductsManager({
@@ -29,6 +30,8 @@ export function CategoryProductsManager({
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [confirmBulkDelete, setConfirmBulkDelete] = useState(false);
   const [bulkDeleting, setBulkDeleting] = useState(false);
+  const [bulkEditing, setBulkEditing] = useState(false);
+  const [bulkMessage, setBulkMessage] = useState("");
   const [downloading, setDownloading] = useState(false);
 
   function exitSelectMode() {
@@ -171,6 +174,7 @@ export function CategoryProductsManager({
       </div>
 
       {error ? <p className="mt-2 text-sm text-red-600">{error}</p> : null}
+      {bulkMessage && <p role="status" className="mt-2 text-sm text-emerald-700">{bulkMessage}</p>}
       {uploading ? (
         <p className="mt-2 text-sm text-neutral-500">
           Mengunggah gambar {uploading.done + 1} dari {uploading.total}...
@@ -298,9 +302,10 @@ export function CategoryProductsManager({
 
       {selectMode && selectedIds.size > 0 ? (
         <div className="fixed inset-x-0 bottom-4 z-40 flex justify-center px-4">
-          <div className="flex items-center gap-3 rounded-full bg-neutral-900 px-4 py-2.5 shadow-xl">
+          <div className="flex flex-wrap items-center justify-center gap-2 rounded-2xl bg-neutral-900 px-3 py-2.5 shadow-xl">
             <span className="text-sm font-medium text-white">{selectedIds.size} item</span>
             <div className="h-4 w-px bg-white/20" />
+            <button type="button" onClick={() => { setBulkMessage(""); setBulkEditing(true); }} className="rounded-full bg-white px-3 py-1.5 text-sm font-medium text-neutral-900">Edit massal</button>
             <button
               type="button"
               onClick={() => setConfirmBulkDelete(true)}
@@ -334,6 +339,16 @@ export function CategoryProductsManager({
           </div>
         </div>
       ) : null}
+
+      {bulkEditing && <BulkProductDialog categoryId={categoryId} ids={Array.from(selectedIds)} onClose={() => setBulkEditing(false)} onSaved={(changes, count) => {
+        setProducts((previous) => previous.map((product) => selectedIds.has(product.id) ? { ...product, ...changes } : product));
+        setBulkEditing(false);
+        setBulkMessage(`${count} produk berhasil diperbarui.`);
+        exitSelectMode();
+        router.refresh();
+        // Refresh local state from the server so subsequent edits use the saved values.
+        fetch(`/api/products?categoryId=${encodeURIComponent(categoryId)}`).then((res) => res.json()).then((data) => { if (Array.isArray(data.products)) setProducts(data.products); }).catch(() => {});
+      }} />}
 
       <ConfirmDialog
         open={confirmBulkDelete}
